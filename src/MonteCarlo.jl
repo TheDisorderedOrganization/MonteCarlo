@@ -13,6 +13,8 @@ include("pgmc/learning.jl")
 include("pgmc/pgmc_simulation.jl")
 
 
+export sample_action!,perform_action!, perform_action_cached!, invert_action!
+export log_proposal_density, delta_log_target_density 
 export callback_acceptance,  callback_temperature
 export Simulation, MonteCarloSimulation, PolicyGuidedMonteCarloSimulation
 export scheduler, store_trajectory, write_summary, save_data, run!, InitialiseSummary
