@@ -1,10 +1,10 @@
-# MCMC <img src="mcmc_logo.png" alt="mcmc" width="50"/>
+# MonteCarlo <img src="mcmc_logo.png" alt="mcmc" width="50"/>
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
 
 ## Overview
 
-The `MCMC` module provides a flexible and extensible Monte Carlo simulation framework that can be applied to various systems. This framework allows users to perform Monte Carlo simulations with ease and provides the necessary tools to define and manage different types of systems. While the module includes some predefined systems, users can add and integrate their own systems into the framework. If you add a new system, please submit a pull request!
+The `MonteCarlo` module provides a flexible and extensible Monte Carlo simulation framework that can be applied to various systems. This framework allows users to perform Monte Carlo simulations with ease and provides the necessary tools to define and manage different types of systems. The module includes some simple predefined systems for example purposes, and some systems are defined in other repos like `ParticlsMC`.
 
 ## Features
 
