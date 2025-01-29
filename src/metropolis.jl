@@ -1,11 +1,11 @@
 using Random, Distributions, Statistics, LinearAlgebra
 
-
-sample_action!(action::Action, policy::Policy, parameters, system, rng) = println("Error: No sample_action! is defined")
-log_proposal_density(action, policy, parameters, system) = println("Error: No log_proposal_density is defined")
-perform_action!(system, action::Action) = println("Error: No perform_action! is defined")
-delta_log_target_density(x1, x2, system) = println("Error: No delta_log_target_density is defined")
-invert_action!(action::Action, system) = println("Error: No invert_action is defined")
+raise_error(s) = error("No $s is defined")
+sample_action!(action::Action, policy::Policy, parameters, system, rng) = raise_error("sample_action!")
+log_proposal_density(action, policy, parameters, system) = raise_error("log_proposal_density")
+perform_action!(system, action::Action) = raise_error("perform_action!")
+delta_log_target_density(x1, x2, system) = raise_error("delta_log_target_density")
+invert_action!(action::Action, system) = raise_error("invert_action!")
 perform_action_cached!(system, action::Action) = perform_action!(system, action)
 
 mutable struct Move{A<:Action,P<:Policy,V<:AbstractArray,T<:AbstractFloat}
