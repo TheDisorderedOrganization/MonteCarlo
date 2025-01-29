@@ -34,7 +34,7 @@ function Simulation(
 end
 
 function save_data(trj_files, cb_files, callbacks, t::Int, simulation)
-    simulation.store_trajectory && for c in eachindex(chains)
+    simulation.store_trajectory && for c in eachindex(simulation.chains)
         store_trajectory(trj_files[c], simulation.chains[c], t)
     end
     for k in eachindex(cb_files)
