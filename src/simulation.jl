@@ -75,7 +75,7 @@ function run!(simulation::MonteCarloSimulation, callbacks...)
     ## Create files for trajectories and callbacks
     simulation.verbose && println("Opening files...")
     trj_paths = joinpath.(simulation.path, "trajectories", ["$c" for c in eachindex(simulation.chains)])
-    simulation.store_trajectory && mkpath.(trj_paths)
+    mkpath.(trj_paths)
     trj_files = simulation.store_trajectory ? open.(joinpath.(trj_paths, "trajectory.xyz"), "w") : nothing
     simulation.verbose && simulation.store_trajectory && println("$(length(trj_files)) trajectory files created")
     cb_paths = joinpath.(simulation.path, [replace(string(cb), "callback_" => "") * ".dat" for cb in callbacks])
@@ -110,7 +110,7 @@ function run!(simulation::MonteCarloSimulation, callbacks...)
         simulation.store_trajectory && close.(trj_files)
         close.(cb_files)
         # Save last snapshots
-        simulation.store_trajectory && for c in eachindex(simulation.chains)
+        for c in eachindex(simulation.chains)
             open(joinpath(trj_paths[c], "lastframe.xyz"), "w") do trj
                 store_trajectory(trj, simulation.chains[c], simulation.steps)
             end
