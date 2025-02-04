@@ -37,10 +37,6 @@ function write_system(io, system)
     return nothing
 end
 
-function write_parameters(::Policy, parameters)
-    return "$(collect(vec(parameters)))"
-end
-
 function write_summary(simulation, ::InitialiseSummary)
     open(joinpath(simulation.path, "summary.log"), "w") do file
         println(file, "MONTE CARLO SIMULATION")

@@ -1,5 +1,9 @@
 using Random, Distributions, Statistics, LinearAlgebra
 
+abstract type Action end
+
+abstract type Policy end
+
 raise_error(s) = error("No $s is defined")
 sample_action!(action::Action, policy::Policy, parameters, system, rng) = raise_error("sample_action!")
 log_proposal_density(action, policy, parameters, system) = raise_error("log_proposal_density")
