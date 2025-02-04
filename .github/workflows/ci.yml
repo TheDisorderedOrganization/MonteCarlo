@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+      branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '1.11.2'
+      
+    - name: Cache Julia packages
+      uses: actions/cache@v3
+      with:
+        # Cache the artifacts and compiled directories
+        path: |
+          ~/.julia/artifacts
+          ~/.julia/compiled
+        # Unique cache key based on the dependencies
+        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml', '**/Manifest.toml') }}
+        # Fallback keys if the exact cache isn't found
+        restore-keys: |
+          ${{ runner.os }}-julia-
+
+    - name: Install dependencies
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
+
+    - name: Run tests
+      run: julia --project=. -e 'using Pkg; Pkg.test()'
