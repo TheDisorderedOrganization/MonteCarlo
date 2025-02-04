@@ -7,6 +7,8 @@ struct Enzyme_Backend <: AD_Backend end
 
 struct Zygote_Backend <: AD_Backend end
 
+reward(action::Action, system) = raise_error("reward")
+
 function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Enzyme_Backend;
     shadow=deepcopy(system)) where {T<:AbstractArray}
     _, logq = autodiff(
