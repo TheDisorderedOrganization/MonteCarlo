@@ -16,5 +16,3 @@ Manifest.toml
 log_output/
 log_error/
 data/
-
-!config_0.xyz
