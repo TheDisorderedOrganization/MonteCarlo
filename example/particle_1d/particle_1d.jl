@@ -16,7 +16,7 @@ end
 
 System(x, β) = Particle(x, β)
 
-function MonteCarlo.delta_log_target_density(e₁, e₂, system)
+function MonteCarlo.delta_log_target_density(e₁, e₂, system::Particle)
     return -system.β * (e₂ - e₁)
 end
 

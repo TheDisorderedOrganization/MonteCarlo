@@ -12,6 +12,7 @@ Manifest.toml
 *.pdf
 *.DS_Store
 *.gz
+*.cov
 
 log_output/
 log_error/
