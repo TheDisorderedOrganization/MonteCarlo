@@ -1,5 +1,3 @@
-using Dates
-
 ###############################################################################
 
 function scheduler(steps::Int, burn::Int, Δt::Int)
