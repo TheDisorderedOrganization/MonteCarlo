@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Update Julia dependencies in the Project.toml and Manifest.toml
+  - package-ecosystem: "github-actions"
+    directory: "/"  # Root directory (where Project.toml is)
+    schedule:
+      interval: "daily"  # Checks for updates every week
+    open-pull-requests-limit: 5  # Limit to 5 open PRs at a time
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps):"
