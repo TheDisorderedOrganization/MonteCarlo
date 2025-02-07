@@ -1,13 +1,5 @@
 module MonteCarlo
 
-using Random
-using Distributions
-using Statistics
-using LinearAlgebra
-using Transducers
-using ConcreteStructs
-using Dates
-
 include("metropolis.jl")
 include("utils.jl")
 include("simulation.jl")
@@ -19,9 +11,6 @@ export mc_step!, mc_sweep!
 export callback_acceptance
 export Simulation, MonteCarloSimulation
 export scheduler, run!
-
-using Enzyme: autodiff, ReverseWithPrimal, Const, Duplicated
-using Zygote: withgradient
 
 include("pgmc/gradients.jl")
 include("pgmc/learning.jl")

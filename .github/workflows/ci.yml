@@ -18,14 +18,17 @@ jobs:
       uses: julia-actions/setup-julia@v2
       with:
         version: '1.11.3'
-
+      
     - name: Cache Julia packages
       uses: actions/cache@v4
       with:
+        # Cache the artifacts and compiled directories
         path: |
           ~/.julia/artifacts
           ~/.julia/compiled
-        key: ${{ runner.os }}-julia-${{ hashFiles('test/Project.toml', 'test/Manifest.toml') }}
+        # Unique cache key based on the dependencies
+        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml', '**/Manifest.toml') }}
+        # Fallback keys if the exact cache isn't found
         restore-keys: |
           ${{ runner.os }}-julia-
 
@@ -38,11 +41,11 @@ jobs:
 
     - name: Run tests
       run: julia --project=test -e 'using Pkg; Pkg.add("Test"); Pkg.test("MonteCarlo", coverage=true)'
-
     - uses: julia-actions/julia-processcoverage@v1
-
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
         fail_ci_if_error: true
         token: ${{ secrets.CODECOV_TOKEN }}
+    
+    

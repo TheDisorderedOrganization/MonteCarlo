@@ -1,3 +1,5 @@
+using ConcreteStructs, StatsBase, Transducers, Distributions
+
 abstract type Simulation end
 
 @concrete mutable struct MonteCarloSimulation <: Simulation
