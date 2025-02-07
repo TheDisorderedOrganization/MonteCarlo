@@ -34,7 +34,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        julia --project=test -e '
+        julia --project=. -e '
           using Pkg
           Pkg.instantiate() 
           Pkg.add(["Test", "Coverage", "DelimitedFiles", "ComponentArrays"]) '
