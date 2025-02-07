@@ -25,7 +25,7 @@ jobs:
         path: |
           ~/.julia/artifacts
           ~/.julia/compiled
-        key: ${{ runner.os }}-julia-${{ hashFiles('test/Project.toml', 'test/Manifest.toml') }}
+        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml', '**/Manifest.toml') }}
         restore-keys: |
           ${{ runner.os }}-julia-
 
@@ -33,11 +33,11 @@ jobs:
       run: |
         julia --project=test -e '
           using Pkg
-          Pkg.develop(path=".")
-          Pkg.instantiate() '
+          Pkg.instantiate() 
+          Pkg.add(["Test, Coverage, DelimitedFiles, ComponentArrays"]) '
 
     - name: Run tests
-      run: julia --project=test -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate(); Pkg.test("MonteCarlo", coverage=true)'
+      run: julia --project=. -e 'using Pkg; Pkg.test(coverage=true)'
 
     - uses: julia-actions/julia-processcoverage@v1
 
