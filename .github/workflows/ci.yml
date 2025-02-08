@@ -37,7 +37,7 @@ jobs:
         julia --project=. -e '
           using Pkg
           Pkg.instantiate() 
-          Pkg.add(["DelimitedFiles", "ComponentArrays"]) '
+          Pkg.add(["ComponentArrays", "DelimitedFiles"]) '
 
     - name: Run tests
       run: julia --project=. -e 'using Pkg; Pkg.test(coverage=true)'
