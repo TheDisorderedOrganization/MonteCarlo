@@ -5,7 +5,6 @@ using Distributions
 using Statistics
 using LinearAlgebra
 using Transducers
-using ConcreteStructs
 using Dates
 
 include("simulation.jl")
@@ -29,21 +28,5 @@ include("pgmc/pgmc.jl")
 
 export Static, VPG, BLPG, BLAPG, NPG, ANPG, BLANPG, reward
 export PolicyGradientEstimator, PolicyGradientUpdate
-
-# export Simulation, MonteCarloSimulation
-# export scheduler, run!
-
-
-
-
-# include("pgmc/gradients.jl")
-# include("pgmc/learning.jl")
-# include("pgmc/pgmc_simulation.jl")
-
-# export PolicyGradient, Static, VPG, BLPG, BLAPG, NPG, ANPG, BLANPG
-# export PolicyGuidedMonteCarloSimulation, GradientData, pgmc_estimate, reward
-
-
-
 
 end

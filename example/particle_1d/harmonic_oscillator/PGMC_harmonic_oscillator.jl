@@ -9,21 +9,37 @@ seed = 42
 rng = Xoshiro(seed)
 β = 2.0
 M = 10
-chains = [Particle(4rand(rng) - 2, β) for _ in 1:M]
+chains = [System(4rand(rng) - 2, β) for _ in 1:M]
 pools = [(
-    Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 0.6),
+    Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.2), 0.6),
     Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 0.4),
 ) for _ in 1:M]
 optimisers = (Static(), VPG(0.001))
 steps = 10^5
 burn = 1000
 block = [0, 10]
-sampletimes = scheduler(steps, burn, block)
+sampletimes = build_schedule(steps, burn, block)
 path = "data/PGMC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
-simulation = Simulation(chains, pools, optimisers, steps;
-    sampletimes=sampletimes, seed=seed, store_trajectory=true, store_parameters=true, parallel=false, verbose=true, path=path)
-callbacks = (callback_energy, callback_acceptance)
-run!(simulation, callbacks...)
+
+metropolis = Metropolis(chains, pools; seed=seed, parallel=false)
+pge = PolicyGradientEstimator(chains, pools, optimisers)
+pgu = PolicyGradientUpdate(chains, pge)
+learn_ids = [k for k in eachindex(optimisers) if !isa(optimisers[k], Static)]
+
+algorithms = (
+    metropolis,
+    pge,
+    pgu,
+    StoreCallbacks((callback_energy, callback_acceptance), path),
+    StoreTrajectories(chains, path),
+    StoreLastFrames(chains, path),
+    PrintTimeSteps(),
+    StoreParameters(pools[1], path; ids=learn_ids),
+)
+schedulers = [build_schedule(steps, 0, 1), build_schedule(steps, 0, 1), build_schedule(steps, 0, 2), sampletimes, sampletimes, [0, steps], build_schedule(steps, burn, steps ÷ 10), sampletimes]
+simulation = Simulation(chains, algorithms, steps; schedulers=schedulers, path=path, verbose=true)
+
+run!(simulation)
 
 
 ## PLOT RESULTS

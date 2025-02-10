@@ -3,7 +3,6 @@ uuid = "07692032-97b4-4f8d-80d7-e18df88d31a9"
 version = "0.1.0"
 
 [deps]
-ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
