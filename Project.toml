@@ -17,4 +17,5 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
 Coverage = "1.6.1"
-julia="1.9"
+Enzyme = "0.12.36"
+julia = "1.9"
