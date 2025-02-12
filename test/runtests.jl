@@ -12,14 +12,21 @@ potential(x) = x^2
     steps = 10^6
     burn = 1000
     block = [0, 10]
-    sampletimes = scheduler(steps, burn, block)
+    sampletimes = build_schedule(steps, burn, block)
     for β in [2.0, 2.5, 3.0]
         chains = [System(4rand(rng) - 2, β) for _ in 1:M]
         pools = [(Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),) for _ in 1:M]
         path = "data/MC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
-        simulation = Simulation(chains, pools, steps; sampletimes=sampletimes, seed=seed, parallel=false, verbose=false, store_trajectory=true, path=path)
-        callbacks = (callback_energy, callback_acceptance)
-        run!(simulation, callbacks...)
+        algorithms = (
+            Metropolis(chains, pools; seed=seed, parallel=false),
+            StoreCallbacks((callback_energy, callback_acceptance), path),
+            StoreTrajectories(chains, path),
+            StoreLastFrames(chains, path),
+            PrintTimeSteps(),
+        )
+        schedulers = [build_schedule(steps, 0, 1), sampletimes, sampletimes, [0, steps], build_schedule(steps, burn, steps ÷ 10)]
+        simulation = Simulation(chains, algorithms, steps; schedulers=schedulers, path=path, verbose=true)
+        run!(simulation)
         μ⁺ = 0.0
         σ⁺ = 1 / sqrt(2β)
         trj_files = [joinpath(dir, "trajectory.xyz") for dir in readdir(joinpath(path, "trajectories"), join=true)]
