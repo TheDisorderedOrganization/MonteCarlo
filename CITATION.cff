@@ -1,0 +1,7 @@
+@software{MonteCarlo,
+  author = {Galliano, Leonardo and Simon, Romain},
+  title = {{MonteCarlo.jl}},
+  url = {https://github.com/TheDisorderedOrganization/MonteCarlo},
+  version = {0.1.0},
+  year = {2025}
+}
