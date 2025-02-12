@@ -49,6 +49,7 @@ function mc_sweep!(system, pool, rng; mc_steps=1)
     end
     return nothing
 end
+
 struct Metropolis{P,R<:AbstractRNG,C<:Function,VS<:AbstractArray} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     sweepstep::Int              # Number of mc steps per mc sweep
