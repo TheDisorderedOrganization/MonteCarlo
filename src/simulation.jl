@@ -3,7 +3,6 @@ mutable struct Simulation{S, A}
     algorithms::A                   # List of algorithms
     steps::Int                      # Number of MC sweeps
     t::Int                          # Current time step
-    schedulers::Vector{Vector{Int}} # List of schedulers (one for each algorithm)
     counters::Vector{Int}           # Counters for the schedulers (one for each algorithm)
     path::String                    # Simulation path
     verbose::Bool                   # Flag for verbose
@@ -12,17 +11,17 @@ mutable struct Simulation{S, A}
         chains::Vector{S},
         algorithms::A,
         steps::Int;
-        schedulers::Vector{Vector{Int}}=[build_schedule(steps, 0, 1) for _ in algorithms],
         path::String="data",
         verbose::Bool=false
     ) where {S,A}
-        @assert length(schedulers) == length(algorithms)
-        @assert all(scheduler -> all(x -> 0 ≤ x ≤ steps, scheduler), schedulers)
-        @assert all(scheduler -> issorted(scheduler), schedulers)
+        for algorithm in algorithms
+            @assert all(t -> 0 ≤ t ≤ steps, algorithm.scheduler)
+            @assert issorted(algorithm.scheduler)
+        end
         t = 0
-        counters = findfirst.(x -> x > 0, schedulers)
+        counters = findfirst.(x -> x > 0, [algorithm.scheduler for algorithm in algorithms])
         mkpath(path)
-        return new{S, A}(chains, algorithms, steps, t, schedulers, counters, path, verbose)
+        return new{S, A}(chains, algorithms, steps, t, counters, path, verbose)
     end
 
 end
@@ -45,12 +44,13 @@ function run!(simulation::Simulation)
         simulation.verbose && println("RUN...")
         sim_time = @elapsed for simulation.t in 1:simulation.steps
             for k in eachindex(simulation.algorithms)
-                if simulation.t == simulation.schedulers[k][simulation.counters[k]]
+                if simulation.t == simulation.algorithms[k].scheduler[simulation.counters[k]]
                     make_step!(simulation, simulation.algorithms[k])
                     simulation.counters[k] += 1
                 end
             end
         end
+        simulation.verbose && println("Simulation completed in $sim_time s")
         update_summary(simulation, sim_time)
     finally
         simulation.verbose && println("FINALISATION")

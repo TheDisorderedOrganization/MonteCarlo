@@ -17,9 +17,9 @@ function write_system(io, system)
     return nothing
 end
 
-function write_algorithm(io, algorithm::Algorithm, scheduler)
+function write_algorithm(io, algorithm::Algorithm)
     println(io, "\t" * replace(string(typeof(algorithm)), r"\{.*" => ""))
-    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
+    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ algorithm.scheduler[end], algorithm.scheduler)))")
 end
 
 function write_summary(simulation)
@@ -37,8 +37,8 @@ function write_summary(simulation)
         write_system(file, simulation.chains[1])
         println(file)
         println(file, "Algorithms:")
-        for (algorithm, scheduler) in zip(simulation.algorithms, simulation.schedulers)
-            write_algorithm(file, algorithm, scheduler)
+        for algorithm in simulation.algorithms
+            write_algorithm(file, algorithm)
         end
         println(file)
     end
@@ -65,12 +65,13 @@ function finalise_summary(simulation)
     end
 end
 
-struct StoreCallbacks{V} <: Algorithm
+struct StoreCallbacks{V,VS<:AbstractArray} <: Algorithm
     callbacks::V
     paths::Vector{String}
     files::Vector{IOStream}
+    scheduler::VS
 
-    function StoreCallbacks(callbacks::V, path) where {V}
+    function StoreCallbacks(chains, path, step, callbacks::V; scheduler::VS=1:steps) where {V, VS<:AbstractArray}
         mkpath(path)
         paths = joinpath.(path, [replace(string(cb), "callback_" => "") * ".dat" for cb in callbacks])
         files = Vector{IOStream}(undef, length(paths))
@@ -79,7 +80,7 @@ struct StoreCallbacks{V} <: Algorithm
         finally
             close.(files)
         end
-        return new{V}(callbacks, paths, files)
+        return new{V,VS}(callbacks, paths, files, scheduler)
     end
 
 end
@@ -103,11 +104,12 @@ function finalise(algorithm::StoreCallbacks, simulation::Simulation)
     return nothing
 end
 
-struct StoreTrajectories <: Algorithm
+struct StoreTrajectories{VS<:AbstractArray} <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
+    scheduler::VS
 
-    function StoreTrajectories(chains, path)
+    function StoreTrajectories(chains, path, steps; scheduler::VS=1:steps) where {VS<:AbstractArray}
         dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
         mkpath.(dirs)
         paths = joinpath.(dirs, "trajectory.xyz")
@@ -117,7 +119,7 @@ struct StoreTrajectories <: Algorithm
         finally
             close.(files)
         end
-        return new(paths, files)
+        return new{VS}(paths, files, scheduler)
     end
 
 end
@@ -147,14 +149,15 @@ function finalise(algorithm::StoreTrajectories, simulation::Simulation)
     return nothing
 end
 
-struct StoreLastFrames <: Algorithm
+struct StoreLastFrames{VS<:AbstractArray} <: Algorithm
     paths::Vector{String}
+    scheduler::VS
 
-    function StoreLastFrames(chains, path)
+    function StoreLastFrames(chains, path, steps; scheduler::VS=[steps]) where{VS<:AbstractArray}
         dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
         mkpath.(dirs)
         paths = joinpath.(dirs, "lastframe.xyz")
-        return new(paths)
+        return new{VS}(paths, scheduler)
     end
 
 end
@@ -168,7 +171,14 @@ function finalise(algorithm::StoreLastFrames, simulation::Simulation)
     return nothing
 end
 
-struct PrintTimeSteps <: Algorithm end
+struct PrintTimeSteps{VS<:AbstractArray} <: Algorithm
+    scheduler::VS
+
+    function PrintTimeSteps(chains, path, steps; scheduler::VS=1:steps) where {VS<:AbstractArray}
+        return new{VS}(scheduler)
+    end
+    
+end
 
 function make_step!(simulation::Simulation, ::PrintTimeSteps)
     println("t = $(simulation.t)")

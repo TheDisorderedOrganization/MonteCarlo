@@ -1,4 +1,4 @@
-struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:AbstractArray,VG<:AbstractArray,VC<:AbstractArray,VL<:AbstractArray,ADB<:AD_Backend,R<:AbstractRNG,C<:Function} <: Algorithm
+struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:AbstractArray,VG<:AbstractArray,VC<:AbstractArray,VL<:AbstractArray,ADB<:AD_Backend,R<:AbstractRNG,C<:Function,VS<:AbstractArray} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     optimisers::O               # List of optimisers (one for each move)
     learn_ids::Vector{Int}      # List of learnable moves
@@ -15,17 +15,21 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
     rngs::Vector{R}             # Vector of random number generators
     parallel::Bool              # Flag to parallelise over different threads
     reducer::C                  # Transducer to reduce results from parallelised loops
+    scheduler::VS               # Timesteps at which the algorithm is called
 
     function PolicyGradientEstimator(
         chains::Vector{S},
+        path::AbstractString,
+        steps::Int,
         pools::Vector{P},
         optimisers::O;
         q_batch_size::Int=1,
         ad_backend::AD_Backend=Enzyme_Backend(),
         seed::Int=1,
         R::DataType=Xoshiro,
-        parallel::Bool=false
-    ) where {S,P,O}
+        parallel::Bool=false,
+        scheduler::VS=1:steps
+    ) where {S,P,O,VS<:AbstractArray}
         # Safety checks
         @assert length(chains) == length(pools)
         @assert all(k -> all(move -> move.parameters == getindex.(pools, k)[1].parameters, getindex.(pools, k)), eachindex(pools[1]))
@@ -54,9 +58,9 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
         rngs = [R(s) for s in seeds]
         # Handle parallelism
         reducer = parallel ? Transducers.foldxt : Transducers.foldxl
-        return new{P,O,typeof(policy_list),typeof(parameters_list),typeof(objectives),typeof(gradients_data),typeof(chains_shadow),typeof(∇logqs_forward),typeof(ad_backend),R,typeof(reducer)}(
+        return new{P,O,typeof(policy_list),typeof(parameters_list),typeof(objectives),typeof(gradients_data),typeof(chains_shadow),typeof(∇logqs_forward),typeof(ad_backend),R,typeof(reducer),VS}(
             pools, optimisers, learn_ids, q_batch_size, policy_list, parameters_list, objectives, gradients_data,
-            chains_shadow, ∇logqs_forward, ∇logqs_backward, ad_backend, seed, rngs, parallel, reducer
+            chains_shadow, ∇logqs_forward, ∇logqs_backward, ad_backend, seed, rngs, parallel, reducer, scheduler
             )
     end
 
@@ -87,9 +91,9 @@ function make_step!(simulation::Simulation, algorithm::PolicyGradientEstimator)
     return nothing
 end
 
-function write_algorithm(io, algorithm::PolicyGradientEstimator, scheduler)
+function write_algorithm(io, algorithm::PolicyGradientEstimator)
     println(io, "\tPolicyGradientEstimator")
-    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
+    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ algorithm.scheduler[end], algorithm.scheduler)))")
     println(io, "\t\tLearnable moves: $(algorithm.learn_ids)")
     println(io, "\t\tQ batch size: $(algorithm.q_batch_size)")
     println(io, "\t\tAD backend: $(algorithm.ad_backend)")
@@ -100,14 +104,23 @@ function write_algorithm(io, algorithm::PolicyGradientEstimator, scheduler)
     end
 end
 
-struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorithm
+struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray,VS<:AbstractArray} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     optimisers::O               # List of optimisers (one for each move)
     learn_ids::Vector{Int}      # List of learnable moves
     parameters_list::VPR        # List of current parameters values (one array for each move)
     gradients_data::VG          # Gradient information (one for each move)
+    scheduler::VS               # Timesteps at which the algorithm is called
 
-    function PolicyGradientUpdate(chains::Vector{S}, pools::Vector{P}, optimisers::O, gradients_data::VG) where {S,P,O,VG}
+    function PolicyGradientUpdate(
+        chains::Vector{S},
+        path::AbstractString,
+        steps::Int,
+        pools::Vector{P},
+        optimisers::O,
+        gradients_data::VG;
+        scheduler::VS=1:steps
+        ) where {S,P,O,VG,VS<:AbstractArray}
         # Safety checks
         @assert length(chains) == length(pools)
         @assert all(k -> all(move -> move.parameters == getindex.(pools, k)[1].parameters, getindex.(pools, k)), eachindex(pools[1]))
@@ -124,13 +137,9 @@ struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorit
                 pool[k].parameters = parameters_list[k]
             end
         end
-        return new{P,O,typeof(parameters_list),VG}(pools, optimisers, learn_ids, parameters_list,  gradients_data)
+        return new{P,O,typeof(parameters_list),VG,VS}(pools, optimisers, learn_ids, parameters_list,  gradients_data, scheduler)
     end
 
-end
-
-function PolicyGradientUpdate(chains, pge::PolicyGradientEstimator)
-    return PolicyGradientUpdate(chains, pge.pools, pge.optimisers, pge.gradients_data)
 end
 
 function make_step!(::Simulation, algorithm::PolicyGradientUpdate)
@@ -142,9 +151,9 @@ function make_step!(::Simulation, algorithm::PolicyGradientUpdate)
     return nothing
 end
 
-function write_algorithm(io, algorithm::PolicyGradientUpdate, scheduler)
+function write_algorithm(io, algorithm::PolicyGradientUpdate)
     println(io, "\tPolicyGradientUpdate")
-    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
+    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ algorithm.scheduler[end], algorithm.scheduler)))")
     println(io, "\t\tLearnable moves: $(algorithm.learn_ids)")
     println(io, "\t\tOptimisers:")
     for (k, opt) in enumerate(algorithm.optimisers)

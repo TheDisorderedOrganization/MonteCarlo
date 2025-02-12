@@ -49,29 +49,35 @@ function mc_sweep!(system, pool, rng; mc_steps=1)
     end
     return nothing
 end
-struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
+struct Metropolis{P,R<:AbstractRNG,C<:Function,VS<:AbstractArray} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     sweepstep::Int              # Number of mc steps per mc sweep
     seed::Int                   # Random number seed
     rngs::Vector{R}             # Vector of random number generators
     parallel::Bool              # Flag to parallelise over different threads
     collecter::C                # Transducer to collect results from parallelised loops
+    scheduler::VS               # Timesteps at which the algorithm is called
 
     function Metropolis(
         chains::Vector{S},
+        path::AbstractString,
+        steps::Int,
         pools::Vector{P};
         sweepstep::Int=1,
         seed::Int=1,
         R::DataType=Xoshiro,
-        parallel::Bool=false
-    ) where {S,P}
+        parallel::Bool=false,
+        scheduler::VS=1:steps
+    ) where {S,P,VS<:AbstractArray}
         @assert length(chains) == length(pools)
         @assert all(k -> all(move -> move.parameters == getindex.(pools, k)[1].parameters, getindex.(pools, k)), eachindex(pools[1]))
         @assert all(k -> all(move -> move.weight == getindex.(pools, k)[1].weight, getindex.(pools, k)), eachindex(pools[1]))
+        @assert all(t -> 0 ≤ t ≤ steps, scheduler)
+        @assert issorted(scheduler)
         seeds = [seed + c - 1 for c in eachindex(chains)]
         rngs = [R(s) for s in seeds]
         collecter = parallel ? Transducers.tcollect : collect
-        return new{P,R,typeof(collecter)}(pools, sweepstep, seed, rngs, parallel, collecter)
+        return new{P,R,typeof(collecter),VS}(pools, sweepstep, seed, rngs, parallel, collecter, scheduler)
     end
 
 end
@@ -93,9 +99,9 @@ function write_parameters(::Policy, parameters)
     return "$(collect(vec(parameters)))"
 end
 
-function write_algorithm(io, algorithm::Metropolis, scheduler)
+function write_algorithm(io, algorithm::Metropolis)
     println(io, "\tMetropolis")
-    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
+    println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ algorithm.scheduler[end], algorithm.scheduler)))")
     println(io, "\t\tMC steps per simulation step: $(algorithm.sweepstep)")
     println(io, "\t\tSeed: $(algorithm.seed)")
     println(io, "\t\tParallel: $(algorithm.parallel)")
@@ -112,12 +118,20 @@ function write_algorithm(io, algorithm::Metropolis, scheduler)
     end
 end
 
-struct StoreParameters{V<:AbstractArray} <: Algorithm
+struct StoreParameters{V<:AbstractArray, VS<:AbstractArray} <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
     parameters_list::V
+    scheduler::VS
 
-    function StoreParameters(pool, path; ids=collect(eachindex(pool)))
+    function StoreParameters(
+        chains,
+        path,
+        steps,
+        pool;
+        ids=collect(eachindex(pool)),
+        scheduler::VS=1:steps
+        ) where{VS<:AbstractArray}
         parameters_list = [move.parameters for move in pool[ids]]
         dirs = joinpath.(path, "parameters", ["$k" for k in ids])
         mkpath.(dirs)
@@ -128,7 +142,7 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
         finally
             close.(files)
         end
-        return new{typeof(parameters_list)}(paths, files, parameters_list)
+        return new{typeof(parameters_list),VS}(paths, files, parameters_list, scheduler)
     end
 
 end

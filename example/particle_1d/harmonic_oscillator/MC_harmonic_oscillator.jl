@@ -18,14 +18,13 @@ sampletimes = build_schedule(steps, burn, block)
 path = "data/MC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
 
 algorithms = (
-    Metropolis(chains, pools; seed=seed, parallel=false),
-    StoreCallbacks((callback_energy, callback_acceptance), path),
-    StoreTrajectories(chains, path),
-    StoreLastFrames(chains, path),
-    PrintTimeSteps(),
+    Metropolis(chains, path, steps, pools; seed=seed, parallel=false),
+    StoreCallbacks(chains, path, steps, (callback_energy, callback_acceptance); scheduler=sampletimes),
+    StoreTrajectories(chains, path, steps; scheduler=sampletimes),
+    StoreLastFrames(chains, path, steps),
+    PrintTimeSteps(chains, path, steps; scheduler=build_schedule(steps, burn, steps ÷ 10)),
 )
-schedulers = [build_schedule(steps, 0, 1), sampletimes, sampletimes, [0, steps], build_schedule(steps, burn, steps ÷ 10)]
-simulation = Simulation(chains, algorithms, steps; schedulers=schedulers, path=path, verbose=true)
+simulation = Simulation(chains, algorithms, steps; path=path, verbose=true)
 
 run!(simulation)
 
