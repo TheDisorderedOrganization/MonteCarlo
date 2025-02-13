@@ -1,4 +1,4 @@
-# MonteCarlo <img src="mcmc_logo.png" alt="mcmc" width="50"/>
+# MonteCarlo <img src="tdo_logo.png" alt="tdo" width="50"/>
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
 [![codecov](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo)
