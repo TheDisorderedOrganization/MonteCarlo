@@ -85,6 +85,9 @@ struct StoreCallbacks{V} <: Algorithm
 end
 
 function StoreCallbacks(chains, path, steps; callbacks=missing)
+    if ismissing(callbacks)
+        callbacks = []
+    end
     return StoreCallbacks(callbacks, path)
 end
 
@@ -98,6 +101,7 @@ end
 function make_step!(simulation::Simulation, algorithm::StoreCallbacks)
     for (callback, file) in zip(algorithm.callbacks, algorithm.files)
         println(file, "$(simulation.t) $(callback(simulation))")
+        flush(file)
     end
 end
 
@@ -145,6 +149,7 @@ end
 function make_step!(simulation::Simulation, algorithm::StoreTrajectories)
     for c in eachindex(simulation.chains)
         store_trajectory(algorithm.files[c], simulation.chains[c], simulation.t)
+        flush(algorithm.files[c])
     end
 end
 
