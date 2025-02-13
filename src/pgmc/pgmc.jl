@@ -62,6 +62,10 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
 
 end
 
+function PolicyGradientEstimator(chains, path, steps; pools=missing, optimisers=missing, q_batch_size=1, ad_backend=Enzyme_Backend(), seed=1, R=Xoshiro, parallel=false)
+    return PolicyGradientEstimator(chains, pools, optimisers; q_batch_size=q_batch_size, ad_backend=ad_backend, seed=seed, R=R, parallel=parallel)
+end
+
 function make_step!(simulation::Simulation, algorithm::PolicyGradientEstimator)
     for (k, lid) in enumerate(algorithm.learn_ids)
         gd = algorithm.reducer(+,
@@ -129,7 +133,10 @@ struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorit
 
 end
 
-function PolicyGradientUpdate(chains, pge::PolicyGradientEstimator)
+function PolicyGradientUpdate(chains, path, steps; dependencies=missing)
+    @assert length(dependencies) == 1
+    @assert isa(dependencies[1], PolicyGradientEstimator)
+    pge = dependencies[1]
     return PolicyGradientUpdate(chains, pge.pools, pge.optimisers, pge.gradients_data)
 end
 
@@ -151,3 +158,5 @@ function write_algorithm(io, algorithm::PolicyGradientUpdate, scheduler)
         println(io, "\t\t\tMove $k: " * replace(string(opt), r"\{[^\{\}]*\}" => ""))
     end
 end
+
+nothing

@@ -77,6 +77,10 @@ struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
 
 end
 
+function Metropolis(chains, path, steps; pools=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false)
+    return Metropolis(chains, pools; sweepstep=sweepstep, seed=seed, R=R, parallel=parallel)
+end
+
 function make_step!(simulation::Simulation, algorithm::Metropolis)
     algorithm.collecter(
         eachindex(simulation.chains) |> Map(c -> begin
@@ -132,6 +136,10 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
         return new{typeof(parameters_list)}(paths, files, parameters_list)
     end
 
+end
+
+function StoreParameters(chains, path, steps; pools=missing, ids=collect(eachindex(pools[1])))
+    return StoreParameters(pools[1], path; ids=ids)
 end
 
 function initialise(algorithm::StoreParameters, simulation::Simulation)
