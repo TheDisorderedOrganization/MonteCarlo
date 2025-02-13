@@ -19,13 +19,8 @@ export Metropolis, callback_acceptance, StoreParameters
 export build_schedule, StoreCallbacks, StoreTrajectories, StoreLastFrames, PrintTimeSteps
 export Simulation, run!
 
-using Enzyme: autodiff, ReverseWithPrimal, Const, Duplicated
-using Zygote: withgradient
-
-include("pgmc/gradients.jl")
-include("pgmc/learning.jl")
-include("pgmc/pgmc.jl")
-
+include("PolicyGuided/PolicyGuided.jl")
+using .PolicyGuided: Static, VPG, BLPG, BLAPG, NPG, ANPG, BLANPG, reward, PolicyGradientEstimator, PolicyGradientUpdate
 export Static, VPG, BLPG, BLAPG, NPG, ANPG, BLANPG, reward
 export PolicyGradientEstimator, PolicyGradientUpdate
 
