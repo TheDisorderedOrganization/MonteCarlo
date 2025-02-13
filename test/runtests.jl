@@ -17,15 +17,14 @@ potential(x) = x^2
         chains = [System(4rand(rng) - 2, β) for _ in 1:M]
         pools = [(Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),) for _ in 1:M]
         path = "data/MC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
-        algorithms = (
-            Metropolis(chains, pools; seed=seed, parallel=false),
-            StoreCallbacks((callback_energy, callback_acceptance), path),
-            StoreTrajectories(chains, path),
-            StoreLastFrames(chains, path),
-            PrintTimeSteps(),
+        algorithm_list = (
+            (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
+            (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
+            (algorithm=StoreTrajectories, scheduler=sampletimes),
+            (algorithm=StoreLastFrames, scheduler=[steps]),
+            (algorithm=PrintTimeSteps, scheduler=build_schedule(steps, burn, steps ÷ 10)),
         )
-        schedulers = [build_schedule(steps, 0, 1), sampletimes, sampletimes, [0, steps], build_schedule(steps, burn, steps ÷ 10)]
-        simulation = Simulation(chains, algorithms, steps; schedulers=schedulers, path=path, verbose=true)
+        simulation = Simulation(chains, algorithm_list, steps; path=path, verbose=true)
         run!(simulation)
         μ⁺ = 0.0
         σ⁺ = 1 / sqrt(2β)

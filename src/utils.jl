@@ -84,6 +84,10 @@ struct StoreCallbacks{V} <: Algorithm
 
 end
 
+function StoreCallbacks(chains, path, steps; callbacks=missing)
+    return StoreCallbacks(callbacks, path)
+end
+
 function initialise(algorithm::StoreCallbacks, simulation::Simulation)
     simulation.verbose && println("Opening callback files...")
     algorithm.files .= open.(algorithm.paths, "w")
@@ -120,6 +124,10 @@ struct StoreTrajectories <: Algorithm
         return new(paths, files)
     end
 
+end
+
+function StoreTrajectories(chains, path, steps)
+    return StoreTrajectories(chains, path)
 end
 
 function store_trajectory(trj, system, t)
@@ -159,6 +167,10 @@ struct StoreLastFrames <: Algorithm
 
 end
 
+function StoreLastFrames(chains, path, steps)
+    return StoreLastFrames(chains, path)
+end
+
 function finalise(algorithm::StoreLastFrames, simulation::Simulation)
     for c in eachindex(simulation.chains)
         open(algorithm.paths[c], "w") do file
@@ -169,6 +181,10 @@ function finalise(algorithm::StoreLastFrames, simulation::Simulation)
 end
 
 struct PrintTimeSteps <: Algorithm end
+
+function PrintTimeSteps(chains, path, steps)
+    return PrintTimeSteps()
+end
 
 function make_step!(simulation::Simulation, ::PrintTimeSteps)
     println("t = $(simulation.t)")

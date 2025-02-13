@@ -21,25 +21,44 @@ block = [0, 10]
 sampletimes = build_schedule(steps, burn, block)
 path = "data/PGMC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
 
-metropolis = Metropolis(chains, pools; seed=seed, parallel=false)
-pge = PolicyGradientEstimator(chains, pools, optimisers)
-pgu = PolicyGradientUpdate(chains, pge)
-learn_ids = [k for k in eachindex(optimisers) if !isa(optimisers[k], Static)]
+# algorithm_list = (
+#     (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
+#     (algorithm=PolicyGradientEstimator, pools=pools, optimisers=optimisers, seed=seed, parallel=false),
+#     (algorithm=PolicyGradientUpdate, scheduler=build_schedule(steps, 0, 2)),
+#     (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
+#     (algorithm=StoreTrajectories, scheduler=sampletimes),
+#     (algorithm=StoreLastFrames, scheduler=[steps]),
+#     (algorithm=PrintTimeSteps, scheduler=build_schedule(steps, burn, steps ÷ 10)),
+# )
 
-algorithms = (
-    metropolis,
-    pge,
-    pgu,
-    StoreCallbacks((callback_energy, callback_acceptance), path),
-    StoreTrajectories(chains, path),
-    StoreLastFrames(chains, path),
-    PrintTimeSteps(),
-    StoreParameters(pools[1], path; ids=learn_ids),
+algorithm_list = (
+    (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
+    (algorithm=PolicyGradientEstimator, pools=pools, optimisers=optimisers, seed=seed, parallel=false),
+    (algorithm=PolicyGradientUpdate, dependencies=(PolicyGradientEstimator,)),
+    (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
+    (algorithm=StoreTrajectories, scheduler=sampletimes),
+    (algorithm=StoreParameters, pools=pools, scheduler=sampletimes),
+    (algorithm=StoreLastFrames, scheduler=[steps]),
+    (algorithm=PrintTimeSteps, scheduler=build_schedule(steps, burn, steps ÷ 10)),
 )
-schedulers = [build_schedule(steps, 0, 1), build_schedule(steps, 0, 1), build_schedule(steps, 0, 2), sampletimes, sampletimes, [0, steps], build_schedule(steps, burn, steps ÷ 10), sampletimes]
-simulation = Simulation(chains, algorithms, steps; schedulers=schedulers, path=path, verbose=true)
 
+simulation = Simulation(chains, algorithm_list, steps; path=path, verbose=true)
 run!(simulation)
+
+# algorithms = (
+#     metropolis,
+#     pge,
+#     pgu,
+#     StoreCallbacks((callback_energy, callback_acceptance), path),
+#     StoreTrajectories(chains, path),
+#     StoreLastFrames(chains, path),
+#     PrintTimeSteps(),
+#     StoreParameters(pools[1], path; ids=learn_ids),
+# )
+# schedulers = [build_schedule(steps, 0, 1), build_schedule(steps, 0, 1), build_schedule(steps, 0, 2), sampletimes, sampletimes, [0, steps], build_schedule(steps, burn, steps ÷ 10), sampletimes]
+# simulation = Simulation(chains, algorithms, steps; schedulers=schedulers, path=path, verbose=true)
+
+# run!(simulation)
 
 
 ## PLOT RESULTS
