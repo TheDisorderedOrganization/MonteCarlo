@@ -62,7 +62,7 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
 
 end
 
-function PolicyGradientEstimator(chains, path, steps; pools=missing, optimisers=missing, q_batch_size=1, ad_backend=Enzyme_Backend(), seed=1, R=Xoshiro, parallel=false)
+function PolicyGradientEstimator(chains; pools=missing, optimisers=missing, q_batch_size=1, ad_backend=Enzyme_Backend(), seed=1, R=Xoshiro, parallel=false, extras...)
     return PolicyGradientEstimator(chains, pools, optimisers; q_batch_size=q_batch_size, ad_backend=ad_backend, seed=seed, R=R, parallel=parallel)
 end
 

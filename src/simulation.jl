@@ -41,7 +41,8 @@ function Simulation(chains, algorithm_list, steps; path="data", verbose=false)
             parent_instances = algorithms_tmp[parent_ids]
             kwargs = merge(kwargs, (dependencies=parent_instances,))
         end
-        push!(algorithms_tmp, constructor.algorithm(chains, path, steps; kwargs...))
+        kwargs = merge(kwargs, (path=path, steps=steps, verbose=verbose))
+        push!(algorithms_tmp, constructor.algorithm(chains; kwargs...))
     end
     schedulers = ntuple(k -> schedulers_tmp[k], length(schedulers_tmp))
     algorithms = ntuple(k -> algorithms_tmp[k], length(algorithms_tmp))

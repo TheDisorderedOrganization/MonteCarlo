@@ -27,7 +27,7 @@ struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorit
 
 end
 
-function PolicyGradientUpdate(chains, path, steps; dependencies=missing)
+function PolicyGradientUpdate(chains; dependencies=missing, extras...)
     @assert length(dependencies) == 1
     @assert isa(dependencies[1], PolicyGradientEstimator)
     pge = dependencies[1]
