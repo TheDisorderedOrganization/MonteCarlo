@@ -121,8 +121,10 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
     parameters_list::V
+    store_first::Bool
+    store_last::Bool
 
-    function StoreParameters(pool, path; ids=collect(eachindex(pool)))
+    function StoreParameters(pool, path; ids=collect(eachindex(pool)), store_first::Bool=true, store_last::Bool=false)
         parameters_list = [move.parameters for move in pool[ids]]
         dirs = joinpath.(path, "parameters", ["$k" for k in ids])
         mkpath.(dirs)
@@ -133,30 +135,31 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
         finally
             close.(files)
         end
-        return new{typeof(parameters_list)}(paths, files, parameters_list)
+        return new{typeof(parameters_list)}(paths, files, parameters_list, store_first, store_last)
     end
 
 end
 
-function StoreParameters(chains; path=missing, pools=missing, ids=collect(eachindex(pools[1])), extras...)
-    return StoreParameters(pools[1], path; ids=ids)
+function StoreParameters(chains; path=missing, pools=missing, ids=collect(eachindex(pools[1])), store_first=true, store_last=false, extras...)
+    return StoreParameters(pools[1], path; ids=ids, store_first=store_first, store_last=store_last)
 end
 
 function initialise(algorithm::StoreParameters, simulation::Simulation)
     simulation.verbose && println("Opening parameter files...")
     algorithm.files .= open.(algorithm.paths, "w")
-    make_step!(simulation, algorithm)
+    algorithm.store_first && make_step!(simulation, algorithm)
     return nothing
 end
 
 function make_step!(simulation::Simulation, algorithm::StoreParameters)
     for k in eachindex(algorithm.files)
         println(algorithm.files[k], "$(simulation.t) $(collect(algorithm.parameters_list[k]))")
+        flush(algorithm.files[k])
     end
 end
 
 function finalise(algorithm::StoreParameters, simulation::Simulation)
-    make_step!(simulation, algorithm)
+    algorithm.store_last && make_step!(simulation, algorithm)
     simulation.verbose && println("Closing parameter files...")
     close.(algorithm.files)
     return nothing
