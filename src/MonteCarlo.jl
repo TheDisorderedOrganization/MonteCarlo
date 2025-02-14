@@ -20,8 +20,4 @@ export build_schedule, StoreCallbacks, StoreTrajectories, StoreLastFrames, Print
 export Simulation, run!
 
 include("PolicyGuided/PolicyGuided.jl")
-using .PolicyGuided: Static, VPG, BLPG, BLAPG, NPG, ANPG, BLANPG, reward, PolicyGradientEstimator, PolicyGradientUpdate
-export Static, VPG, BLPG, BLAPG, NPG, ANPG, BLANPG, reward
-export PolicyGradientEstimator, PolicyGradientUpdate
-
 end
