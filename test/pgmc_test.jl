@@ -15,12 +15,11 @@ potential(x) = x^2
     chains = [System(4rand(rng) - 2, β) for _ in 1:M]
     σ₀ = 0.2
     pools = [(
-        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.4),
-        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.2),
-        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.2),
-        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.2),
+        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.5),
+        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.25),
+        Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.25),
     ) for _ in 1:M]
-    optimisers = (Static(), VPG(0.001), BLPG(0.001), BLAPG(1e-9))
+    optimisers = (Static(), VPG(0.001), BLPG(0.001))
     steps = 10^5
     burn = 1000
     block = [0, 10]
