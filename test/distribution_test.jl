@@ -5,6 +5,7 @@ using DelimitedFiles
 include("../example/particle_1d/particle_1d.jl")
 
 potential(x) = x^2
+
 @testset "Harmonic oscillator distribution" begin
     seed = 42
     rng = Xoshiro(seed)
@@ -21,6 +22,7 @@ potential(x) = x^2
             (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
             (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
             (algorithm=StoreTrajectories, scheduler=sampletimes),
+            (algorithm=StoreBackups, scheduler=build_schedule(steps, burn, steps ÷ 10), store_first=true, store_last=true),
             (algorithm=StoreLastFrames, scheduler=[steps]),
             (algorithm=PrintTimeSteps, scheduler=build_schedule(steps, burn, steps ÷ 10)),
         )

@@ -69,8 +69,10 @@ struct StoreCallbacks{V} <: Algorithm
     callbacks::V
     paths::Vector{String}
     files::Vector{IOStream}
+    store_first::Bool
+    store_last::Bool
 
-    function StoreCallbacks(callbacks::V, path) where {V}
+    function StoreCallbacks(callbacks::V, path; store_first::Bool=true, store_last::Bool=false) where {V}
         mkpath(path)
         paths = joinpath.(path, [replace(string(cb), "callback_" => "") * ".dat" for cb in callbacks])
         files = Vector{IOStream}(undef, length(paths))
@@ -79,22 +81,22 @@ struct StoreCallbacks{V} <: Algorithm
         finally
             close.(files)
         end
-        return new{V}(callbacks, paths, files)
+        return new{V}(callbacks, paths, files, store_first, store_last)
     end
 
 end
 
-function StoreCallbacks(chains; path=missing, callbacks=missing, extras...)
+function StoreCallbacks(chains; path=missing, callbacks=missing, store_first=true, store_last=false, extras...)
     if ismissing(callbacks)
         callbacks = []
     end
-    return StoreCallbacks(callbacks, path)
+    return StoreCallbacks(callbacks, path; store_first=store_first, store_last=store_last)
 end
 
 function initialise(algorithm::StoreCallbacks, simulation::Simulation)
     simulation.verbose && println("Opening callback files...")
     algorithm.files .= open.(algorithm.paths, "w")
-    make_step!(simulation, algorithm)
+    algorithm.store_first && make_step!(simulation, algorithm)
     return nothing
 end
 
@@ -106,6 +108,7 @@ function make_step!(simulation::Simulation, algorithm::StoreCallbacks)
 end
 
 function finalise(algorithm::StoreCallbacks, simulation::Simulation)
+    algorithm.store_last && make_step!(simulation, algorithm)
     simulation.verbose && println("Closing callback files...")
     close.(algorithm.files)
     return nothing
@@ -114,8 +117,10 @@ end
 struct StoreTrajectories <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
+    store_first::Bool
+    store_last::Bool
 
-    function StoreTrajectories(chains, path)
+    function StoreTrajectories(chains, path; store_first::Bool=true, store_last::Bool=false)
         dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
         mkpath.(dirs)
         paths = joinpath.(dirs, "trajectory.xyz")
@@ -125,12 +130,12 @@ struct StoreTrajectories <: Algorithm
         finally
             close.(files)
         end
-        return new(paths, files)
+        return new(paths, files, store_first, store_last)
     end
 
 end
 
-function StoreTrajectories(chains; path=missing, extras...)
+function StoreTrajectories(chains; path=missing, store_first=true, store_last=false, extras...)
     return StoreTrajectories(chains, path)
 end
 
@@ -142,7 +147,7 @@ end
 function initialise(algorithm::StoreTrajectories, simulation::Simulation)
     simulation.verbose && println("Opening trajectory files...")
     algorithm.files .= open.(algorithm.paths, "w")
-    make_step!(simulation, algorithm)
+    algorithm.store_first && make_step!(simulation, algorithm)
     return nothing
 end
 
@@ -154,7 +159,7 @@ function make_step!(simulation::Simulation, algorithm::StoreTrajectories)
 end
 
 function finalise(algorithm::StoreTrajectories, simulation::Simulation)
-    make_step!(simulation, algorithm)
+    algorithm.store_last && make_step!(simulation, algorithm)
     simulation.verbose && println("Closing trajectory files...")
     close.(algorithm.files)
     return nothing
@@ -182,6 +187,41 @@ function finalise(algorithm::StoreLastFrames, simulation::Simulation)
             store_trajectory(file, simulation.chains[c], simulation.t)
         end
     end
+    return nothing
+end
+
+struct StoreBackups <: Algorithm
+    dirs::Vector{String}
+    store_first::Bool
+    store_last::Bool
+
+    function StoreBackups(chains, path; store_first::Bool=false, store_last::Bool=false)
+        dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
+        mkpath.(dirs)
+        return new(dirs, store_first, store_last)
+    end
+
+end
+
+function StoreBackups(chains; path=missing, store_first=false, store_last=false, extras...)
+    return StoreBackups(chains, path, store_first=store_first, store_last=store_last)
+end
+
+function initialise(algorithm::StoreBackups, simulation::Simulation)
+    algorithm.store_first && make_step!(simulation, algorithm)
+    return nothing
+end
+
+function make_step!(simulation::Simulation, algorithm::StoreBackups)
+    for c in eachindex(simulation.chains)
+        open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t).xyz"), "w") do file
+            store_trajectory(file, simulation.chains[c], simulation.t)
+        end
+    end
+end
+
+function finalise(algorithm::StoreBackups, simulation::Simulation)
+    algorithm.store_last && make_step!(simulation, algorithm)
     return nothing
 end
 
