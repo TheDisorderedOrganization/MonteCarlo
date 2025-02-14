@@ -1,4 +1,5 @@
 using MonteCarlo
+using MonteCarlo.PolicyGuided
 using Random
 using Distributions
 using ComponentArrays
@@ -38,7 +39,7 @@ function MonteCarlo.invert_action!(action::Displacement, system::Particle)
     return nothing
 end
 
-function MonteCarlo.reward(action::Displacement, system::Particle)
+function MonteCarlo.PolicyGuided.reward(action::Displacement, system::Particle)
     return (action.δ)^2
 end
 
