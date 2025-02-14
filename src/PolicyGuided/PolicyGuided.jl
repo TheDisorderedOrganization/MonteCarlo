@@ -2,6 +2,7 @@ module PolicyGuided
 
 using ..MonteCarlo: Action, Policy, Algorithm, Simulation
 using Random
+using Transducers
 using Enzyme: autodiff, ReverseWithPrimal, Const, Duplicated
 using Zygote: withgradient
 

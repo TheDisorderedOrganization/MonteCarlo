@@ -84,7 +84,7 @@ struct StoreCallbacks{V} <: Algorithm
 
 end
 
-function StoreCallbacks(chains, path, steps; callbacks=missing)
+function StoreCallbacks(chains; path=missing, callbacks=missing, extras...)
     if ismissing(callbacks)
         callbacks = []
     end
@@ -130,7 +130,7 @@ struct StoreTrajectories <: Algorithm
 
 end
 
-function StoreTrajectories(chains, path, steps)
+function StoreTrajectories(chains; path=missing, extras...)
     return StoreTrajectories(chains, path)
 end
 
@@ -172,7 +172,7 @@ struct StoreLastFrames <: Algorithm
 
 end
 
-function StoreLastFrames(chains, path, steps)
+function StoreLastFrames(chains; path=missing, extras...)
     return StoreLastFrames(chains, path)
 end
 
@@ -187,7 +187,7 @@ end
 
 struct PrintTimeSteps <: Algorithm end
 
-function PrintTimeSteps(chains, path, steps)
+function PrintTimeSteps(chains; extras...)
     return PrintTimeSteps()
 end
 

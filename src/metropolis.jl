@@ -77,7 +77,7 @@ struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
 
 end
 
-function Metropolis(chains, path, steps; pools=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false)
+function Metropolis(chains; pools=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false, extras...)
     return Metropolis(chains, pools; sweepstep=sweepstep, seed=seed, R=R, parallel=parallel)
 end
 
@@ -138,7 +138,7 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
 
 end
 
-function StoreParameters(chains, path, steps; pools=missing, ids=collect(eachindex(pools[1])))
+function StoreParameters(chains; path=missing, pools=missing, ids=collect(eachindex(pools[1])), extras...)
     return StoreParameters(pools[1], path; ids=ids)
 end
 
