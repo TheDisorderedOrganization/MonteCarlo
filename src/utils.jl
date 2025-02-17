@@ -198,7 +198,7 @@ end
 function finalise(algorithm::StoreLastFrames, simulation::Simulation)
     for c in eachindex(simulation.chains)
         open(algorithm.paths[c], "w") do file
-            store_trajectory(file, simulation.chains[c], simulation.t, fmt)
+            store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
     return nothing
@@ -230,7 +230,7 @@ end
 function make_step!(simulation::Simulation, algorithm::StoreBackups)
     for c in eachindex(simulation.chains)
         open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t).xyz"), "w") do file
-            store_trajectory(file, simulation.chains[c], simulation.t, fmt)
+            store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
 end
