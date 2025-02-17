@@ -60,7 +60,7 @@ end
 
 ###############################################################################
 ## UTILS
-function MonteCarlo.store_trajectory(io, system::Particle, t::Int)
+function MonteCarlo.store_trajectory(io, system::Particle, t::Int, format::TXT)
     println(io, "$t $(system.x)")
     return nothing
 end
