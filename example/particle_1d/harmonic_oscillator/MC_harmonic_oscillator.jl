@@ -43,7 +43,7 @@ target = target_density.(xx, β)
 plot(xlabel="x", ylabel="p(x)", title="β=$β, M=$M", legend=:bottomright)
 plot!(xx, target, lw=3, label="Target density", c=:red)
 
-trj_files = [joinpath(dir, "trajectory.txt") for dir in readdir(joinpath(path, "trajectories"), join=true)]
+trj_files = [joinpath(dir, "trajectory.dat") for dir in readdir(joinpath(path, "trajectories"), join=true)]
 trajectories = map(file -> readdlm(file)[:, 2], trj_files)
 positions = vcat(trajectories...)
 
