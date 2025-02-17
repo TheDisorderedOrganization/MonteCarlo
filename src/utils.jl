@@ -151,6 +151,10 @@ function StoreTrajectories(chains; path=missing, fmt=nothing, store_first=true, 
     return StoreTrajectories(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
+function store_trajectory(io, system, t)
+    return store_trajectory(io, system, t, TXT())
+end
+
 function store_trajectory(io, system, t, fmt::Format)
     println(io, "$t, $system")
     return nothing
@@ -229,7 +233,7 @@ end
 
 function make_step!(simulation::Simulation, algorithm::StoreBackups)
     for c in eachindex(simulation.chains)
-        open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t).xyz"), "w") do file
+        open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t)$(algorithm.fmt.extension)"), "w") do file
             store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
