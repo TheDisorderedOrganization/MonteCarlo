@@ -123,6 +123,13 @@ struct TXT <: Format
     end
 end
 
+struct DAT <: Format
+    extension::String
+    function DAT()
+        return new(".dat")
+    end
+end
+
 struct StoreTrajectories{F<:Format} <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
@@ -146,13 +153,12 @@ struct StoreTrajectories{F<:Format} <: Algorithm
 
 end
 
-function StoreTrajectories(chains; path=missing, fmt=nothing, store_first=true, store_last=false, extras...)
-    fmt = something(fmt, TXT())
+function StoreTrajectories(chains; path=missing, fmt=DAT(), store_first=true, store_last=false, extras...)
     return StoreTrajectories(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
 function store_trajectory(io, system, t)
-    return store_trajectory(io, system, t, TXT())
+    return store_trajectory(io, system, t, DAT())
 end
 
 function store_trajectory(io, system, t, fmt::Format)
@@ -194,8 +200,7 @@ struct StoreLastFrames <: Algorithm
 
 end
 
-function StoreLastFrames(chains; path=missing, fmt=nothing, extras...)
-    fmt = something(fmt, TXT())
+function StoreLastFrames(chains; path=missing, fmt=DAT(), extras...)
     return StoreLastFrames(chains, path, fmt)
 end
 
@@ -221,8 +226,7 @@ struct StoreBackups <: Algorithm
 
 end
 
-function StoreBackups(chains; path=missing, fmt=nothing, store_first=false, store_last=false, extras...)
-    fmt = something(fmt, TXT())
+function StoreBackups(chains; path=missing, fmt=DAT(), store_first=false, store_last=false, extras...)
     return StoreBackups(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
