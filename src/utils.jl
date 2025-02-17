@@ -146,7 +146,7 @@ struct StoreTrajectories{F<:Format} <: Algorithm
 
 end
 
-function StoreTrajectories(chains; path=missing, fmt=missing, store_first=true, store_last=false, extras...)
+function StoreTrajectories(chains; path=missing, fmt=nothing, store_first=true, store_last=false, extras...)
     fmt = something(fmt, TXT())
     return StoreTrajectories(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
@@ -190,7 +190,7 @@ struct StoreLastFrames <: Algorithm
 
 end
 
-function StoreLastFrames(chains; path=missing, fmt=missing, extras...)
+function StoreLastFrames(chains; path=missing, fmt=nothing, extras...)
     fmt = something(fmt, TXT())
     return StoreLastFrames(chains, path, fmt)
 end
@@ -217,7 +217,7 @@ struct StoreBackups <: Algorithm
 
 end
 
-function StoreBackups(chains; path=missing, fmt=missing, store_first=false, store_last=false, extras...)
+function StoreBackups(chains; path=missing, fmt=nothing, store_first=false, store_last=false, extras...)
     fmt = something(fmt, TXT())
     return StoreBackups(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
