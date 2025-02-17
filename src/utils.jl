@@ -185,7 +185,7 @@ struct StoreLastFrames <: Algorithm
         mkpath.(dirs)
         ext = fmt.extension
         paths = joinpath.(dirs, "lastframe$ext")
-        return new(paths)
+        return new(paths, fmt)
     end
 
 end
