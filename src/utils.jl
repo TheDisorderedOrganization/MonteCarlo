@@ -157,10 +157,6 @@ function StoreTrajectories(chains; path=missing, fmt=DAT(), store_first=true, st
     return StoreTrajectories(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
-function store_trajectory(io, system, t)
-    return store_trajectory(io, system, t, DAT())
-end
-
 function store_trajectory(io, system, t, fmt::Format)
     println(io, "$t, $system")
     return nothing
