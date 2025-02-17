@@ -165,7 +165,7 @@ end
 
 function make_step!(simulation::Simulation, algorithm::StoreTrajectories)
     for c in eachindex(simulation.chains)
-        store_trajectory(algorithm.files[c], simulation.chains[c], simulation.t, algotithm.fmt)
+        store_trajectory(algorithm.files[c], simulation.chains[c], simulation.t, algorithm.fmt)
         flush(algorithm.files[c])
     end
 end
