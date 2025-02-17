@@ -18,6 +18,7 @@ export mc_step!, mc_sweep!
 export Metropolis, callback_acceptance, StoreParameters
 export build_schedule, StoreCallbacks, StoreTrajectories, StoreLastFrames, StoreBackups, PrintTimeSteps
 export Simulation, run!
+export TXT, DAT
 
 include("PolicyGuided/PolicyGuided.jl")
 end

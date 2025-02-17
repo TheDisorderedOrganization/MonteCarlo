@@ -114,33 +114,51 @@ function finalise(algorithm::StoreCallbacks, simulation::Simulation)
     return nothing
 end
 
-struct StoreTrajectories <: Algorithm
+abstract type Format end
+
+struct TXT <: Format
+    extension::String
+    function TXT()
+        return new(".txt")
+    end
+end
+
+struct DAT <: Format
+    extension::String
+    function DAT()
+        return new(".dat")
+    end
+end
+
+struct StoreTrajectories{F<:Format} <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
+    fmt::F
     store_first::Bool
     store_last::Bool
 
-    function StoreTrajectories(chains, path; store_first::Bool=true, store_last::Bool=false)
+    function StoreTrajectories(chains, path, fmt; store_first::Bool=true, store_last::Bool=false)
         dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
         mkpath.(dirs)
-        paths = joinpath.(dirs, "trajectory.xyz")
+        ext = fmt.extension
+        paths = joinpath.(dirs, "trajectory$ext")
         files = Vector{IOStream}(undef, length(paths))
         try
             files = open.(paths, "w")
         finally
             close.(files)
         end
-        return new(paths, files, store_first, store_last)
+        return new{typeof(fmt)}(paths, files, fmt, store_first, store_last)
     end
 
 end
 
-function StoreTrajectories(chains; path=missing, store_first=true, store_last=false, extras...)
-    return StoreTrajectories(chains, path)
+function StoreTrajectories(chains; path=missing, fmt=DAT(), store_first=true, store_last=false, extras...)
+    return StoreTrajectories(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
-function store_trajectory(trj, system, t)
-    println(trj, "$t, $system")
+function store_trajectory(io, system, t, fmt::Format)
+    println(io, "$t, $system")
     return nothing
 end
 
@@ -153,7 +171,7 @@ end
 
 function make_step!(simulation::Simulation, algorithm::StoreTrajectories)
     for c in eachindex(simulation.chains)
-        store_trajectory(algorithm.files[c], simulation.chains[c], simulation.t)
+        store_trajectory(algorithm.files[c], simulation.chains[c], simulation.t, algorithm.fmt)
         flush(algorithm.files[c])
     end
 end
@@ -167,24 +185,25 @@ end
 
 struct StoreLastFrames <: Algorithm
     paths::Vector{String}
-
-    function StoreLastFrames(chains, path)
+    fmt::Format
+    function StoreLastFrames(chains, path, fmt)
         dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
         mkpath.(dirs)
-        paths = joinpath.(dirs, "lastframe.xyz")
-        return new(paths)
+        ext = fmt.extension
+        paths = joinpath.(dirs, "lastframe$ext")
+        return new(paths, fmt)
     end
 
 end
 
-function StoreLastFrames(chains; path=missing, extras...)
-    return StoreLastFrames(chains, path)
+function StoreLastFrames(chains; path=missing, fmt=DAT(), extras...)
+    return StoreLastFrames(chains, path, fmt)
 end
 
 function finalise(algorithm::StoreLastFrames, simulation::Simulation)
     for c in eachindex(simulation.chains)
         open(algorithm.paths[c], "w") do file
-            store_trajectory(file, simulation.chains[c], simulation.t)
+            store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
     return nothing
@@ -192,19 +211,19 @@ end
 
 struct StoreBackups <: Algorithm
     dirs::Vector{String}
+    fmt::Format
     store_first::Bool
     store_last::Bool
-
-    function StoreBackups(chains, path; store_first::Bool=false, store_last::Bool=false)
+    function StoreBackups(chains, path, fmt; store_first::Bool=false, store_last::Bool=false)
         dirs = joinpath.(path, "trajectories", ["$c" for c in eachindex(chains)])
         mkpath.(dirs)
-        return new(dirs, store_first, store_last)
+        return new(dirs, fmt, store_first, store_last)
     end
 
 end
 
-function StoreBackups(chains; path=missing, store_first=false, store_last=false, extras...)
-    return StoreBackups(chains, path, store_first=store_first, store_last=store_last)
+function StoreBackups(chains; path=missing, fmt=DAT(), store_first=false, store_last=false, extras...)
+    return StoreBackups(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
 function initialise(algorithm::StoreBackups, simulation::Simulation)
@@ -214,8 +233,8 @@ end
 
 function make_step!(simulation::Simulation, algorithm::StoreBackups)
     for c in eachindex(simulation.chains)
-        open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t).xyz"), "w") do file
-            store_trajectory(file, simulation.chains[c], simulation.t)
+        open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t)$(algorithm.fmt.extension)"), "w") do file
+            store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
 end
