@@ -30,7 +30,7 @@ potential(x) = x^2
         run!(simulation)
         μ⁺ = 0.0
         σ⁺ = 1 / sqrt(2β)
-        trj_files = [joinpath(dir, "trajectory.txt") for dir in readdir(joinpath(path, "trajectories"), join=true)]
+        trj_files = [joinpath(dir, "trajectory.dat") for dir in readdir(joinpath(path, "trajectories"), join=true)]
         trajectories = map(file -> readdlm(file)[:, 2], trj_files)
         positions = vcat(trajectories...)
         @test isapprox(mean(positions), μ⁺, atol=1e-3)
