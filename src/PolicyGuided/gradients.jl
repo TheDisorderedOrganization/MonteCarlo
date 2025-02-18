@@ -4,25 +4,34 @@ struct Enzyme_Backend <: AD_Backend end
 
 struct Zygote_Backend <: AD_Backend end
 
-reward(action::Action, system) = raise_error("reward")
+struct ForwardDiff_Backend <: AD_Backend end
+
+reward(action::Action, system) = MonteCarlo.raise_error("reward")
 
 function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Enzyme_Backend;
     shadow=deepcopy(system)) where {T<:AbstractArray}
-    _, logq = autodiff(
-        ReverseWithPrimal,
+    _, logq = Enzyme.autodiff(
+        Enzyme.ReverseWithPrimal,
         log_proposal_density,
-        Const(action),
-        Const(policy),
-        Duplicated(parameters, ∇logq),
-        Duplicated(system, shadow)
+        Enzyme.Const(action),
+        Enzyme.Const(policy),
+        Enzyme.Duplicated(parameters, ∇logq),
+        Enzyme.Duplicated(system, shadow)
     )
     return logq
 end
 
 function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Zygote_Backend;
     shadow=deepcopy(system)) where {T<:AbstractArray}
-    logq, gd = withgradient(x -> log_proposal_density(action, policy, x, system), parameters)
+    logq, gd = Zygote.withgradient(x -> log_proposal_density(action, policy, x, system), parameters)
     ∇logq .= gd[1]
+    return logq
+end
+
+function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::ForwardDiff_Backend;
+    shadow=deepcopy(system)) where {T<:AbstractArray}
+    logq = log_proposal_density(action, policy, parameters, system)
+    ∇logq .= ForwardDiff.gradient(p -> log_proposal_density(action, policy, p, system), parameters)
     return logq
 end
 
