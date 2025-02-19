@@ -1,4 +1,4 @@
-# EXAMPLE: Harmonic Oscillator
+# EXAMPLE: PGMC Harmonic Oscillator
 include("../particle_1d.jl")
 
 potential(x) = x^2
