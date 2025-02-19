@@ -21,7 +21,7 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
         pools::Vector{P},
         optimisers::O;
         q_batch_size::Int=1,
-        ad_backend::AD_Backend=Enzyme_Backend(),
+        ad_backend::AD_Backend=ForwardDiff_Backend(),
         seed::Int=1,
         R::DataType=Xoshiro,
         parallel::Bool=false
@@ -47,6 +47,7 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
         gradients_data = map(k -> initialise_gradient_data(parameters_list[k]), learn_ids)
         # Create shadows for Enzyme
         chains_shadow = deepcopy(chains)
+        # Initialise gradients
         ∇logqs_forward = map(zero, parameters_list)
         ∇logqs_backward = map(zero, parameters_list)
         # Handle randomness
@@ -62,7 +63,7 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
 
 end
 
-function PolicyGradientEstimator(chains; pools=missing, optimisers=missing, q_batch_size=1, ad_backend=Enzyme_Backend(), seed=1, R=Xoshiro, parallel=false, extras...)
+function PolicyGradientEstimator(chains; pools=missing, optimisers=missing, q_batch_size=1, ad_backend=ForwardDiff_Backend(), seed=1, R=Xoshiro, parallel=false, extras...)
     return PolicyGradientEstimator(chains, pools, optimisers; q_batch_size=q_batch_size, ad_backend=ad_backend, seed=seed, R=R, parallel=parallel)
 end
 

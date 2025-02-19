@@ -23,10 +23,13 @@ end
 # Baseline adaptive policy gradient
 struct BLAPG{T<:AbstractFloat} <: PolicyGradient
     δ::T
+    ϵid::T
 end
 
+BLAPG(δ::T) where {T<:AbstractFloat} = BLAPG(δ, zero(T))
+
 function learning_step!(parameters::AbstractArray, gd::GradientData, opt::BLAPG)
-    η = sqrt(2opt.δ / dot(gd.∇j, gd.∇j))
+    η = sqrt(2opt.δ / (dot(gd.∇j, gd.∇j) + opt.ϵid))
     parameters .= parameters + η * (gd.∇j - gd.j * gd.∇logq_forward)
 end
 
