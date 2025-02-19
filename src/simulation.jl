@@ -73,7 +73,7 @@ function run!(simulation::Simulation)
                 end
             end
         end
-        simulation.verbose && println("Simulation completed in $sim_time s")
+        simulation.verbose && println("\nSimulation completed in $sim_time s")
         update_summary(simulation, sim_time)
     finally
         simulation.verbose && println("FINALISATION")
