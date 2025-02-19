@@ -1,35 +1,11 @@
 abstract type AD_Backend end
 
-struct Enzyme_Backend <: AD_Backend end
-
-struct Zygote_Backend <: AD_Backend end
-
 struct ForwardDiff_Backend <: AD_Backend end
 
 reward(action::Action, system) = MonteCarlo.raise_error("reward")
 
-function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Enzyme_Backend;
-    shadow=deepcopy(system)) where {T<:AbstractArray}
-    _, logq = Enzyme.autodiff(
-        Enzyme.ReverseWithPrimal,
-        log_proposal_density,
-        Enzyme.Const(action),
-        Enzyme.Const(policy),
-        Enzyme.Duplicated(parameters, ∇logq),
-        Enzyme.Duplicated(system, shadow)
-    )
-    return logq
-end
-
-function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Zygote_Backend;
-    shadow=deepcopy(system)) where {T<:AbstractArray}
-    logq, gd = Zygote.withgradient(x -> log_proposal_density(action, policy, x, system), parameters)
-    ∇logq .= gd[1]
-    return logq
-end
-
 function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::ForwardDiff_Backend;
-    shadow=deepcopy(system)) where {T<:AbstractArray}
+    shadow=missing) where {T<:AbstractArray}
     logq = log_proposal_density(action, policy, parameters, system)
     ∇logq .= ForwardDiff.gradient(p -> log_proposal_density(action, policy, p, system), parameters)
     return logq
@@ -67,7 +43,7 @@ function average(gd::GradientData)
 end
 
 function pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray{T}, system;
-    ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=Enzyme_Backend()) where {T<:AbstractFloat}
+    ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=ForwardDiff_Backend()) where {T<:AbstractFloat}
     ∇logq_forward .= zero(parameters)
     ∇logq_backward .= zero(parameters)
     logq_forward = withgrad_log_proposal_density!(∇logq_forward, action, policy, parameters, system, ad_backend; shadow=shadow)
@@ -85,7 +61,7 @@ function pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray
 end
 
 function sample_gradient_data(action::Action, policy::Policy, parameters::AbstractArray, system, rng;
-    ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=Enzyme_Backend())
+    ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=ForwardDiff_Backend())
     sample_action!(action, policy, parameters, system, rng)
     return pgmc_estimate(action, policy, parameters, system; ∇logq_forward=∇logq_forward, ∇logq_backward=∇logq_backward, shadow=shadow, ad_backend=ad_backend)
 end
