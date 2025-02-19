@@ -5,8 +5,6 @@ import ..MonteCarlo: make_step!, write_algorithm, sample_action!, perform_action
 using Random
 using LinearAlgebra
 using Transducers
-using Enzyme
-using Zygote
 using ForwardDiff
 
 include("gradients.jl")
