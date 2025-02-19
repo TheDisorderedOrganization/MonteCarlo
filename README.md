@@ -103,10 +103,8 @@ end
     ```
 
 - The probability of accepting / rejecting a move in the ` MonteCarlo.delta_log_target_density`. In the example, we provide the classical Metropolis probability of accepting a move based on the energy difference between the old and new state.
-```
-function MonteCarlo.sample_action!(action::Displacement, ::StandardGaussian, parameters, system::Particle, rng)
-    action.δ = rand(rng, Normal(zero(action.δ), parameters.σ))
-    return nothing
+function MonteCarlo.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
+    return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
 end
 ```
 
