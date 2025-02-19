@@ -251,7 +251,12 @@ function PrintTimeSteps(chains; extras...)
 end
 
 function make_step!(simulation::Simulation, ::PrintTimeSteps)
-    println("t = $(simulation.t)")
+    t = simulation.t
+    percent = t / simulation.steps
+    bar_length = 50
+    filled_length = Int(round(percent * bar_length))
+    bar = "\033[1;34m" * repeat("■", filled_length) * "\033[0m" * repeat("□", bar_length - filled_length)
+    @printf("\rProgress: [%s] %.0f%% t = %d", bar, percent * 100, t)
 end
 
 nothing

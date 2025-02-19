@@ -6,6 +6,7 @@ using Statistics
 using LinearAlgebra
 using Transducers
 using Dates
+using Printf
 
 include("simulation.jl")
 include("utils.jl")

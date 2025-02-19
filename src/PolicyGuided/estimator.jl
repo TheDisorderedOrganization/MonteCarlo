@@ -97,11 +97,12 @@ function write_algorithm(io, algorithm::PolicyGradientEstimator, scheduler)
     println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
     println(io, "\t\tLearnable moves: $(algorithm.learn_ids)")
     println(io, "\t\tQ batch size: $(algorithm.q_batch_size)")
-    println(io, "\t\tAD backend: $(algorithm.ad_backend)")
+    println(io, "\t\tAD backend: $(last(split(string(typeof(algorithm.ad_backend)), ".")))")
     println(io, "\t\tSeed: $(algorithm.seed)")
     println(io, "\t\tParallel: $(algorithm.parallel)")
     if algorithm.parallel
         println(io, "\t\tThreads: $(Threads.nthreads())")
     end
 end
+
 nothing

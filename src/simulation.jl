@@ -59,12 +59,13 @@ finalise(::Algorithm, ::Simulation) = nothing
 
 function run!(simulation::Simulation)
     try
-        simulation.verbose && println("INISIALISATION")
+        simulation.verbose && println("\n" * "-" ^ 50)
+        simulation.verbose && println("\033[1;32mINISIALISATION\033[0m")
         for algorithm in simulation.algorithms
             initialise(algorithm, simulation)
         end
         write_summary(simulation)
-        simulation.verbose && println("RUN...")
+        simulation.verbose && println("\033[1;32m\nRUNNING SIMULATION...\033[0m")
         sim_time = @elapsed for simulation.t in 1:simulation.steps
             for k in eachindex(simulation.algorithms)
                 if simulation.t == simulation.schedulers[k][simulation.counters[k]]
@@ -73,15 +74,16 @@ function run!(simulation::Simulation)
                 end
             end
         end
-        simulation.verbose && println("Simulation completed in $sim_time s")
+        simulation.verbose && println("\nSimulation completed in $sim_time s")
         update_summary(simulation, sim_time)
     finally
-        simulation.verbose && println("FINALISATION")
+        simulation.verbose && println("\033[1;32m\nFINALISATION\033[0m")
         for algorithm in simulation.algorithms
             finalise(algorithm, simulation)
         end
         finalise_summary(simulation)
-        simulation.verbose && println("DONE")
+        simulation.verbose && println("\033[1;32m\nDONE\033[0m")
+        simulation.verbose && println("-" ^ 50 * "\n")
     end
     return nothing
 end
