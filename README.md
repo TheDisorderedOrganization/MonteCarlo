@@ -35,7 +35,7 @@ The Particle system is characterized by three key quantities: its position  x , 
 
 The following Julia script initializes and runs the simulation:
 
-```
+```julia
 include("example/particle_1D/particle_1d.jl")
 
 potential(x) = x^2
@@ -70,7 +70,7 @@ Now that you understand how to run a Monte Carlo (MC) simulation, you may want t
 To define a new system, you need to specify its state variables, Monte Carlo moves and how to perform them. These components determine how the system evolves during the simulation. A system consists of:
 	
 - State representation: Defines the key quantities describing the system (e.g., position, energy, temperature). Your system has to be a struct where each element is a state variable. Example:
-```
+```julia
 mutable struct Particle{T<:AbstractFloat}
     x::T
     β::T
@@ -80,20 +80,20 @@ end
 
 - Monte Carlo action: Specifies how the system state changes during the simulation (e.g., random displacements).
     1. Define an action. In the example, the action is a displacement.
-    ```
+    ```julia
     mutable struct Displacement{T<:AbstractFloat} <: Action
         δ::T
     end
     ```
     2. Define how this action is sampled in the `MonteCarlo.sample_action!` function. In the example, the displacement length is sampled from a normal distribution.
-    ```
+    ```julia
     function MonteCarlo.sample_action!(action::Displacement,::StandardGaussian, parameters, system::Particle, rng)
         action.δ = rand(rng, Normal(zero(action.δ), parameters.σ))
         return nothing
     end
     ```
     3. Finally, provide how this action changes the state of the system in the `MonteCarlo.perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. 
-    ```
+    ```julia
     function MonteCarlo.perform_action!(system::Particle, action::Displacement)
         e₁ = system.e
         system.x += action.δ
@@ -103,6 +103,7 @@ end
     ```
 
 - The probability of accepting / rejecting a move in the ` MonteCarlo.delta_log_target_density`. In the example, we provide the classical Metropolis probability of accepting a move based on the energy difference between the old and new state.
+```julia
 function MonteCarlo.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
     return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
 end
