@@ -45,7 +45,7 @@ temperature = 0.5
 β = 1/temperature
 M = 10
 chains = [System(x0, β) for _ in 1:M]
-pools = [(Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),) for _ in 1:M]
+pool = (Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),)
 steps = 10^5
 burn = 1000
 block = [0, 10]
@@ -53,7 +53,7 @@ sampletimes = build_schedule(steps, burn, block)
 path = "data/MC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
 
 algorithm_list = (
-    (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
+    (algorithm=Metropolis, pool=pool, seed=seed, parallel=false),
     (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
     (algorithm=StoreTrajectories, scheduler=sampletimes),
 ) 
