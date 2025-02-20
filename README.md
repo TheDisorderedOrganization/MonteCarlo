@@ -65,7 +65,7 @@ This implementation employs the **Metropolis algorithm** for Monte Carlo samplin
 
 ### Adding Your Own System
 
-Now that you understand how to run a Monte Carlo (MC) simulation, you may want to extend the framework by defining your own system. The file [particle_1D.jl](example/particle_1d/particle_1d.jl) provides a minimal example of a system, which you can use as a reference when creating a new one.
+Now that you understand how to run a Monte Carlo (MC) simulation, you may want to extend the framework by defining your own system. The [particle_1D.jl](example/particle_1d/particle_1d.jl) file provides a minimal example of a system, which you can use as a reference when creating a new one.
 
 To define a new system, you need to specify its state variables, Monte Carlo moves and how to perform them. These components determine how the system evolves during the simulation. A system consists of:
 
