@@ -1,0 +1,5 @@
+# MonteCarlo module
+
+```@docs
+MonteCarlo
+```

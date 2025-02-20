@@ -1,0 +1,59 @@
+# Adding Your Own System
+
+Now that you understand how to run a Monte Carlo (MC) simulation, you may want to extend the framework by defining your own system. The [particle_1d.jl](https://github.com/TheDisorderedOrganization/MonteCarlo/example/particle_1d/particle_1d.jl)  file provides a minimal example of a system, which you can use as a reference when creating a new one.
+
+To define a new system, you need to specify its state variables, Monte Carlo moves and how to perform them. These components determine how the system evolves during the simulation. A system consists of:
+
+## System
+
+**Specify the state representation and the target probability density.**
+
+- State representation: Defines the key quantities describing the system (e.g., position, energy, temperature). Your system has to be a struct where each element is a state variable. Example:
+```julia
+mutable struct Particle{T<:AbstractFloat}
+    x::T
+    β::T
+    e::T
+end
+```
+- Target density: This is the actual probablity distribution of the system that you want to sample. In this case it's the Boltzmann distribution at inverse temperature $\beta$
+```julia
+function MonteCarlo.delta_log_target_density(e₁, e₂, system::Particle)
+    return -system.β * (e₂ - e₁)
+end
+```
+
+## Monte Carlo action
+
+**Specify how the system state changes during the simulation**
+
+- Define an action. In the example, the action is a displacement.
+```julia
+mutable struct Displacement{T<:AbstractFloat} <: Action
+    δ::T
+end
+```
+- Define how this action is sampled in the `MonteCarlo.sample_action!` function. In the example, the displacement length is sampled from a normal distribution.
+```julia
+function MonteCarlo.sample_action!(action::Displacement,::StandardGaussian, parameters, system::Particle, rng)
+    action.δ = rand(rng, Normal(zero(action.δ), parameters.σ))
+    return nothing
+end
+```
+- Specify the probablity of proposing the action in `MonteCarlo.log_proposal_density`. Note that this function must give the exact probability of sampling the action with `MonteCarlo.sample_action!`. In this case, we just need the density of the normal distribution.
+```julia
+function MonteCarlo.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
+    return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
+end
+```
+- Finally, provide how this action changes the state of the system in the `MonteCarlo.perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. 
+```julia
+function MonteCarlo.perform_action!(system::Particle, action::Displacement)
+    e₁ = system.e
+    system.x += action.δ
+    system.e = potential(system.x)
+    return e₁, system.e
+end
+```
+
+By modifying and extending the existing particle_1D.jl example, you can create a variety of physical and mathematical models suitable for MC simulations.
