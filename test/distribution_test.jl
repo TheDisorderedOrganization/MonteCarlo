@@ -16,10 +16,10 @@ potential(x) = x^2
     sampletimes = build_schedule(steps, burn, block)
     for β in [2.0, 2.5, 3.0]
         chains = [System(4rand(rng) - 2, β) for _ in 1:M]
-        pools = [(Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),) for _ in 1:M]
+        pool = (Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),)
         path = "data/MC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
         algorithm_list = (
-            (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
+            (algorithm=Metropolis, pool=pool, seed=seed, parallel=false),
             (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
             (algorithm=StoreTrajectories, scheduler=sampletimes),
             (algorithm=StoreBackups, scheduler=build_schedule(steps, burn, steps ÷ 10), store_first=true, store_last=true),

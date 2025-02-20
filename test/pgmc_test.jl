@@ -14,7 +14,7 @@ potential(x) = x^2
     M = 10
     chains = [System(4rand(rng) - 2, β) for _ in 1:M]
     σ₀ = 0.2
-    pools = [(
+    pool = (
         Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.4),
         Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.1),
         Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.1),
@@ -22,7 +22,7 @@ potential(x) = x^2
         Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.1),
         Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.1),
         Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=σ₀), 0.1),
-    ) for _ in 1:M]
+    )
     optimisers = (Static(), VPG(0.001), BLPG(0.001), BLAPG(1e-6, 1e-6), NPG(1e-2, 1e-6), ANPG(1e-6, 1e-6), BLANPG(1e-6, 1e-6))
     steps = 10^5
     burn = 1000
@@ -30,12 +30,12 @@ potential(x) = x^2
     sampletimes = build_schedule(steps, burn, block)
     path = "data/PGMC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
     algorithm_list = (
-        (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
-        (algorithm=PolicyGradientEstimator, pools=pools, optimisers=optimisers, q_batch_size=10, seed=seed, parallel=true),
+        (algorithm=Metropolis, pool=pool, seed=seed, parallel=false),
+        (algorithm=PolicyGradientEstimator, dependencies=(Metropolis,), optimisers=optimisers, q_batch_size=10, parallel=true),
         (algorithm=PolicyGradientUpdate, dependencies=(PolicyGradientEstimator,), scheduler=build_schedule(steps, burn, 2)),
         (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
         (algorithm=StoreTrajectories, scheduler=sampletimes),
-        (algorithm=StoreParameters, pools=pools, scheduler=sampletimes),
+        (algorithm=StoreParameters, dependencies=(Metropolis,), scheduler=sampletimes),
         (algorithm=StoreLastFrames, scheduler=[steps]),
         (algorithm=PrintTimeSteps, scheduler=build_schedule(steps, burn, steps ÷ 10)),
     )

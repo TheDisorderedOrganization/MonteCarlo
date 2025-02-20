@@ -63,7 +63,11 @@ struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:Abs
 
 end
 
-function PolicyGradientEstimator(chains; pools=missing, optimisers=missing, q_batch_size=1, ad_backend=ForwardDiff_Backend(), seed=1, R=Xoshiro, parallel=false, extras...)
+function PolicyGradientEstimator(chains; dependencies=missing, optimisers=missing, q_batch_size=1, ad_backend=ForwardDiff_Backend(), R=Xoshiro, parallel=false, extras...)
+    @assert length(dependencies) == 1
+    @assert isa(dependencies[1], Metropolis)
+    metropolis = dependencies[1]
+    pools, seed = metropolis.pools, metropolis.seed
     return PolicyGradientEstimator(chains, pools, optimisers; q_batch_size=q_batch_size, ad_backend=ad_backend, seed=seed, R=R, parallel=parallel)
 end
 
