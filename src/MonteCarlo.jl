@@ -1,3 +1,8 @@
+"""
+    module MonteCarlo
+
+The `MonteCarlo` module provides a flexible and extensible framework for performing Monte Carlo simulations.
+"""
 module MonteCarlo
 
 using Random
