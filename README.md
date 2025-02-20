@@ -121,7 +121,7 @@ By modifying and extending the existing particle_1D.jl example, you can create a
 
 We welcome contributions from the community. If you have a new system or feature to add, please fork the repository, make your changes, and submit a pull request.
 
-## Citing MonteCarlo
+## Citing
 
 If you use MonteCarlo in your research, please cite it! You can find the citation information in the [CITATION](CITATION.cff) file or directly through GitHub’s "Cite this repository" button.
 
