@@ -66,18 +66,31 @@ struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
         R::DataType=Xoshiro,
         parallel::Bool=false
     ) where {S,P}
+        # Safety checks
         @assert length(chains) == length(pools)
         @assert all(k -> all(move -> move.parameters == getindex.(pools, k)[1].parameters, getindex.(pools, k)), eachindex(pools[1]))
         @assert all(k -> all(move -> move.weight == getindex.(pools, k)[1].weight, getindex.(pools, k)), eachindex(pools[1]))
+        #Make sure that all policies and parameters across chains refer to the same objects
+        policy_list = [move.policy for move in pools[1]]
+        parameters_list = [move.parameters for move in pools[1]]
+        for pool in pools
+            for k in eachindex(policy_list)
+                pool[k].policy = policy_list[k]
+                pool[k].parameters = parameters_list[k]
+            end
+        end
+        # Handle randomness
         seeds = [seed + c - 1 for c in eachindex(chains)]
         rngs = [R(s) for s in seeds]
+        # Handle parallelism
         collecter = parallel ? Transducers.tcollect : collect
         return new{P,R,typeof(collecter)}(pools, sweepstep, seed, rngs, parallel, collecter)
     end
 
 end
 
-function Metropolis(chains; pools=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false, extras...)
+function Metropolis(chains; pool=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false, extras...)
+    pools = [deepcopy(pool) for _ in chains]
     return Metropolis(chains, pools; sweepstep=sweepstep, seed=seed, R=R, parallel=parallel)
 end
 
@@ -140,8 +153,14 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
 
 end
 
-function StoreParameters(chains; path=missing, pools=missing, ids=collect(eachindex(pools[1])), store_first=true, store_last=false, extras...)
-    return StoreParameters(pools[1], path; ids=ids, store_first=store_first, store_last=store_last)
+function StoreParameters(chains; dependencies=missing, path=missing, ids=missing, store_first=true, store_last=false, extras...)
+    @assert length(dependencies) == 1
+    @assert isa(dependencies[1], Metropolis)
+    pool = dependencies[1].pools[1]
+    if ismissing(ids)
+        ids = collect(eachindex(pool))
+    end
+    return StoreParameters(pool, path; ids=ids, store_first=store_first, store_last=store_last)
 end
 
 function initialise(algorithm::StoreParameters, simulation::Simulation)

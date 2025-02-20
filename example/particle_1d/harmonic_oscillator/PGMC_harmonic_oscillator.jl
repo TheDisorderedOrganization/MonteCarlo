@@ -11,10 +11,10 @@ rng = Xoshiro(seed)
 β = 2.0
 M = 10
 chains = [System(4rand(rng) - 2, β) for _ in 1:M]
-pools = [(
+pool = (
     Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.2), 0.6),
     Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 0.4),
-) for _ in 1:M]
+) 
 optimisers = (Static(), VPG(0.001))
 steps = 10^5
 burn = 1000
@@ -22,12 +22,12 @@ block = [0, 10]
 sampletimes = build_schedule(steps, burn, block)
 path = "data/PGMC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
 algorithm_list = (
-    (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
-    (algorithm=PolicyGradientEstimator, pools=pools, optimisers=optimisers, seed=seed, parallel=false),
+    (algorithm=Metropolis, pool=pool, seed=seed, parallel=false),
+    (algorithm=PolicyGradientEstimator, dependencies=(Metropolis,), optimisers=optimisers, parallel=false),
     (algorithm=PolicyGradientUpdate, dependencies=(PolicyGradientEstimator,)),
     (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
     (algorithm=StoreTrajectories, scheduler=sampletimes),
-    (algorithm=StoreParameters, pools=pools, scheduler=sampletimes),
+    (algorithm=StoreParameters, dependencies=(Metropolis,), scheduler=sampletimes),
     (algorithm=StoreLastFrames, scheduler=[steps]),
     (algorithm=PrintTimeSteps, scheduler=build_schedule(steps, burn, steps ÷ 10)),
 )

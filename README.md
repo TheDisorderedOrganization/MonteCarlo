@@ -45,7 +45,7 @@ temperature = 0.5
 β = 1/temperature
 M = 10
 chains = [System(x0, β) for _ in 1:M]
-pools = [(Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),) for _ in 1:M]
+pool = (Move(Displacement(0.0), StandardGaussian(), ComponentArray(σ=0.1), 1.0),)
 steps = 10^5
 burn = 1000
 block = [0, 10]
@@ -53,7 +53,7 @@ sampletimes = build_schedule(steps, burn, block)
 path = "data/MC/particle_1d/Harmonic/beta$β/M$M/seed$seed"
 
 algorithm_list = (
-    (algorithm=Metropolis, pools=pools, seed=seed, parallel=false),
+    (algorithm=Metropolis, pool=pool, seed=seed, parallel=false),
     (algorithm=StoreCallbacks, callbacks=(callback_energy, callback_acceptance), scheduler=sampletimes),
     (algorithm=StoreTrajectories, scheduler=sampletimes),
 ) 
@@ -121,7 +121,7 @@ By modifying and extending the existing particle_1D.jl example, you can create a
 
 We welcome contributions from the community. If you have a new system or feature to add, please fork the repository, make your changes, and submit a pull request.
 
-## Citing MonteCarlo
+## Citing
 
 If you use MonteCarlo in your research, please cite it! You can find the citation information in the [CITATION](CITATION.cff) file or directly through GitHub’s "Cite this repository" button.
 
