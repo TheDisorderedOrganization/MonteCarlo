@@ -1,23 +1,23 @@
 # MonteCarlo <img src="tdo_logo.png" alt="tdo" width="50"/>
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
+[![CI](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo)
 
 ## Overview
 
-The `MonteCarlo` module provides a flexible and extensible Monte Carlo simulation framework. This framework allows users to perform Monte Carlo simulations with ease and provides the necessary tools to define and manage different types of systems. The module includes some simple predefined systems for example purposes, and more complex systems are defined in other repos like `ParticlesMC`.
+MonteCarlo is a flexible and extensible framework for Monte Carlo simulations. Instead of acting as a black-box simulator, it provides a modular structure where users define their own system and Monte Carlo "moves". The package includes some simple predefined systems for example purposes, and more complex systems are defined in other repos like [ParticlesMC](https://github.com/TheDisorderedOrganization/ParticlesMC).
 
 ## Features
 
-- **Monte Carlo Simulation Framework**: A robust and flexible framework for performing Monte Carlo simulations.
-- **Predefined Systems**: Includes several predefined systems to get started quickly.
-- **Extensibility**: Users can easily add and integrate their own systems into the framework.
-- **Policy-Guided Monte Carlo Simulation**: Advanced simulation techniques using policy-guided Monte Carlo methods.
-
+- **General-Purpose Monte Carlo Engine**: A lightweight framework that provides the core algorithms for Monte Carlo sampling, allowing users to define their own systems, moves, and proposal distributions.
+- **Extensible Algorithms**: Built-in support for Metropolis-Hastings with the flexibility to implement advanced techniques like event-chain Monte Carlo.
+- **Policy-Guided Monte Carlo**: Integrates adaptive sampling using policy gradient methods to optimise move parameters dynamically.
+- **Predefined Systems**: Includes simple examples to help users get started quickly, with additional system implementations available through companion repositories like [ParticlesMC](https://github.com/TheDisorderedOrganization/ParticlesMC).
 
 ## Installation
 
-To install the `MonteCarlo` module, you can clone the repository and use the Julia package manager to add the module path to your environment.
+To install the MonteCarlo module, you can clone the repository and use the Julia package manager to add the module path to your environment.
 
 ```sh
 git clone https://github.com/TheDisorderedOrganization/MonteCarlo.git
@@ -31,7 +31,7 @@ julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 
 To perform a Monte Carlo (MC) simulation, it is necessary to define the system and the set of possible moves, followed by executing the simulation using the appropriate functions. Below, we present a basic Monte Carlo simulation utilizing the Particle system and move set defined in [particle_1D.jl](example/particle_1d/particle_1d.jl).
 
-The Particle system is characterized by three key quantities: its position  x , the inverse temperature  \beta, and its energy  e . The Monte Carlo move applied to the particle consists of a displacement by  \delta x , where  \delta x  is sampled from a user-defined probability distribution (that we call policy).
+The Particle system is characterized by three key quantities: its position  $x$, the inverse temperature  $\beta$, and its energy $e$. The Monte Carlo move applied to the particle consists of a displacement by  $\delta$, where  $\delta$  is sampled from a user-defined probability distribution that we call policy.
 
 The following Julia script initializes and runs the simulation:
 
@@ -68,15 +68,22 @@ This implementation employs the **Metropolis algorithm** for Monte Carlo samplin
 Now that you understand how to run a Monte Carlo (MC) simulation, you may want to extend the framework by defining your own system. The file [particle_1D.jl](example/particle_1d/particle_1d.jl) provides a minimal example of a system, which you can use as a reference when creating a new one.
 
 To define a new system, you need to specify its state variables, Monte Carlo moves and how to perform them. These components determine how the system evolves during the simulation. A system consists of:
-	
-- State representation: Defines the key quantities describing the system (e.g., position, energy, temperature). Your system has to be a struct where each element is a state variable. Example:
-```julia
-mutable struct Particle{T<:AbstractFloat}
-    x::T
-    β::T
-    e::T
-end
-```
+
+- System: Specify the state representation and the target probability density.	
+    1. State representation: Defines the key quantities describing the system (e.g., position, energy, temperature). Your system has to be a struct where each element is a state variable. Example:
+    ```julia
+    mutable struct Particle{T<:AbstractFloat}
+        x::T
+        β::T
+        e::T
+    end
+    ```
+    2. Target density: This is the actual probablity distribution of the system that you want to sample. In this case it's the Boltzmann distribution at inverse temperature $\beta$
+    ```julia
+    function MonteCarlo.delta_log_target_density(e₁, e₂, system::Particle)
+        return -system.β * (e₂ - e₁)
+    end
+    ```
 
 - Monte Carlo action: Specifies how the system state changes during the simulation (e.g., random displacements).
     1. Define an action. In the example, the action is a displacement.
@@ -92,6 +99,12 @@ end
         return nothing
     end
     ```
+    3. Specify the probablity of proposing the action in `MonteCarlo.log_proposal_density`. Note that this function must give the exact probability of sampling the action with `MonteCarlo.sample_action!`. In this case, we just need the density of the normal distribution.
+    ```julia
+    function MonteCarlo.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
+        return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
+    end
+    ```
     3. Finally, provide how this action changes the state of the system in the `MonteCarlo.perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. 
     ```julia
     function MonteCarlo.perform_action!(system::Particle, action::Displacement)
@@ -102,18 +115,15 @@ end
     end
     ```
 
-- The probability of accepting / rejecting a move in the `MonteCarlo.delta_log_target_density`. In the example, we provide the classical Metropolis probability of accepting a move based on the energy difference between the old and new state.
-```julia
-function MonteCarlo.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
-    return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
-end
-```
-
 By modifying and extending the existing particle_1D.jl example, you can create a variety of physical and mathematical models suitable for MC simulations.
 
 ## Contributing
 
 We welcome contributions from the community. If you have a new system or feature to add, please fork the repository, make your changes, and submit a pull request.
+
+## Citing MonteCarlo
+
+If you use MonteCarlo in your research, please cite it! You can find the citation information in the [CITATION](CITATION.cff) file or directly through GitHub’s "Cite this repository" button.
 
 ## License
 
