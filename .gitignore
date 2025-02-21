@@ -14,6 +14,7 @@ Manifest.toml
 *.gz
 *.cov
 
+build/
 log_output/
 log_error/
 data/
