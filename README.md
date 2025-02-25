@@ -1,12 +1,9 @@
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/Arianna/main/logo.png" width="200"/>
+  <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/Arianna/main/logo.png" width="500"/>
   <br><br>
   
 </div>
-
-# Arianna
-
 *A system-agnostic approach to Monte Carlo simulations*
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
