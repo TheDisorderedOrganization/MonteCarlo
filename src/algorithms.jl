@@ -1,68 +1,39 @@
-function build_schedule(steps::Int, burn::Int, Δt::Int)
-    return collect(burn:Δt:steps) ∪ [steps]
-end
+"""
+    abstract type Algorithm
 
-function build_schedule(steps::Int, burn::Int, base::AbstractFloat)
-    return unique(vcat([burn], [burn + Int(base^n) for n in 0:floor(Int, log(base, steps - burn))], [steps]))
-end
+Abstract type for Simulation algorithms.
+"""
+abstract type Algorithm end
 
-function build_schedule(steps::Int, burn::Int, block::Vector{Int})
-    nblock = (steps - burn) ÷ block[end]
-    blocks = [block .+ burn .+ (m - 1) * block[end] for m in 1:nblock]
-    return filter(x -> x ≤ steps, unique(vcat(blocks..., [steps])))
-end
+"""
+    initialise(::Algorithm, ::Simulation)
 
-function write_system(io, system)
-    println(io, "\t" * "$(typeof(system))")
-    return nothing
-end
+Initialise the algorithm for the given simulation.
+"""
+initialise(::Algorithm, ::Simulation) = nothing
 
+"""
+    make_step!(::Simulation, ::Algorithm)
+
+Perform a single step of the algorithm in the simulation.
+"""
+make_step!(::Simulation, ::Algorithm) = nothing
+
+"""
+    finalise(::Algorithm, ::Simulation)
+
+Finalise the algorithm for the given simulation.
+"""
+finalise(::Algorithm, ::Simulation) = nothing
+
+"""
+    write_algorithm(io, algorithm::Algorithm, scheduler)
+
+Write a summary of the algorithm on the given IO stream.
+"""
 function write_algorithm(io, algorithm::Algorithm, scheduler)
     println(io, "\t" * replace(string(typeof(algorithm)), r"\{.*" => ""))
     println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
-end
-
-function write_summary(simulation)
-    open(joinpath(simulation.path, "summary.log"), "w") do file
-        println(file, "SIMULATION SUMMARY")
-        println(file)
-        println(file, "Simulation:")
-        println(file, "\tSteps: $(simulation.steps)")
-        println(file, "\tNumber of chains: $(length(simulation.chains))")
-        println(file, "\tNumber of algorithms: $(length(simulation.algorithms))")
-        println(file, "\tVerbose: $(simulation.verbose)")
-        println(file, "\tStarted on $(now())")
-        println(file)
-        println(file, "System:")
-        write_system(file, simulation.chains[1])
-        println(file)
-        println(file, "Algorithms:")
-        for (algorithm, scheduler) in zip(simulation.algorithms, simulation.schedulers)
-            write_algorithm(file, algorithm, scheduler)
-        end
-        println(file)
-    end
-end
-
-function update_summary(simulation, sim_time)
-    open(joinpath(simulation.path, "summary.log"), "a") do file
-        println(file, "Report:")
-        println(file, "\tSimulation time: $sim_time s")
-    end
-end
-
-function finalise_summary(simulation)
-    open(joinpath(simulation.path, "summary.log"), "a") do file
-        total_size = 0
-        for (root, dirs, files) in walkdir(simulation.path)
-            for file in files
-                total_size += filesize(joinpath(root, file))
-            end
-        end
-        sim_size = total_size / 1024^2
-        println(file, "\tSimulation size: $(sim_size) MB")
-        println(file, "\tStatus: Completed on $(now())")
-    end
 end
 
 struct StoreCallbacks{V} <: Algorithm

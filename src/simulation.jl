@@ -13,7 +13,7 @@ A structure representing a Monte Carlo simulation.
 - `path::String`: Simulation path.
 - `verbose::Bool`: Flag for verbose output.
 """
-mutable struct Simulation{S, A, VS}
+mutable struct Simulation{S,A,VS}
     chains::Vector{S}
     algorithms::A
     steps::Int
@@ -48,7 +48,7 @@ mutable struct Simulation{S, A, VS}
         t = 0
         counters = [findfirst(x -> x > 0, scheduler) for scheduler in schedulers]
         mkpath(path)
-        return new{S, A, VS}(chains, algorithms, steps, t, schedulers, counters, path, verbose)
+        return new{S,A,VS}(chains, algorithms, steps, t, schedulers, counters, path, verbose)
     end
 
 end
@@ -88,32 +88,81 @@ function Simulation(chains, algorithm_list, steps; path="data", verbose=false)
 end
 
 """
-    abstract type Algorithm
+    build_schedule(steps::Int, burn::Int, Δt::Int)
 
-Abstract type for Monte Carlo algorithms.
+Create a vector of timestep from `burn` to `steps` at intervals `Δt`.
 """
-abstract type Algorithm end
-
-"""
-    initialise(::Algorithm, ::Simulation)
-
-Initialise the algorithm for the given simulation.
-"""
-initialise(::Algorithm, ::Simulation) = nothing
+function build_schedule(steps::Int, burn::Int, Δt::Int)
+    return collect(burn:Δt:steps) ∪ [steps]
+end
 
 """
-    make_step!(::Simulation, ::Algorithm)
+    build_schedule(steps::Int, burn::Int, base::AbstractFloat)
 
-Perform a single step of the algorithm in the simulation.
+Create a vector of timestep from `burn` to `steps` log-spaced with base `base`.
 """
-make_step!(::Simulation, ::Algorithm) = nothing
+function build_schedule(steps::Int, burn::Int, base::AbstractFloat)
+    return unique(vcat([burn], [burn + Int(base^n) for n in 0:floor(Int, log(base, steps - burn))], [steps]))
+end
 
 """
-    finalise(::Algorithm, ::Simulation)
+    build_schedule(steps::Int, burn::Int, block::Vector{Int})
 
-Finalise the algorithm for the given simulation.
+Create a vector of timestep from `burn` to `steps` with repeated blocks specified by `block`.
 """
-finalise(::Algorithm, ::Simulation) = nothing
+function build_schedule(steps::Int, burn::Int, block::Vector{Int})
+    nblock = (steps - burn) ÷ block[end]
+    blocks = [block .+ burn .+ (m - 1) * block[end] for m in 1:nblock]
+    return filter(x -> x ≤ steps, unique(vcat(blocks..., [steps])))
+end
+
+function write_system(io, system)
+    println(io, "\t" * "$(typeof(system))")
+    return nothing
+end
+
+function write_summary(simulation)
+    open(joinpath(simulation.path, "summary.log"), "w") do file
+        println(file, "SIMULATION SUMMARY")
+        println(file)
+        println(file, "Simulation:")
+        println(file, "\tSteps: $(simulation.steps)")
+        println(file, "\tNumber of chains: $(length(simulation.chains))")
+        println(file, "\tNumber of algorithms: $(length(simulation.algorithms))")
+        println(file, "\tVerbose: $(simulation.verbose)")
+        println(file, "\tStarted on $(now())")
+        println(file)
+        println(file, "System:")
+        write_system(file, simulation.chains[1])
+        println(file)
+        println(file, "Algorithms:")
+        for (algorithm, scheduler) in zip(simulation.algorithms, simulation.schedulers)
+            write_algorithm(file, algorithm, scheduler)
+        end
+        println(file)
+    end
+end
+
+function update_summary(simulation, sim_time)
+    open(joinpath(simulation.path, "summary.log"), "a") do file
+        println(file, "Report:")
+        println(file, "\tSimulation time: $sim_time s")
+    end
+end
+
+function finalise_summary(simulation)
+    open(joinpath(simulation.path, "summary.log"), "a") do file
+        total_size = 0
+        for (root, dirs, files) in walkdir(simulation.path)
+            for file in files
+                total_size += filesize(joinpath(root, file))
+            end
+        end
+        sim_size = total_size / 1024^2
+        println(file, "\tSimulation size: $(sim_size) MB")
+        println(file, "\tStatus: Completed on $(now())")
+    end
+end
 
 """
     run!(simulation::Simulation)
@@ -125,7 +174,7 @@ Run the Monte Carlo simulation.
 """
 function run!(simulation::Simulation)
     try
-        simulation.verbose && println("\n" * "-" ^ 50)
+        simulation.verbose && println("\n" * "-"^50)
         simulation.verbose && println("\033[1;32mINITIALISATION\033[0m")
         for algorithm in simulation.algorithms
             initialise(algorithm, simulation)
@@ -149,7 +198,7 @@ function run!(simulation::Simulation)
         end
         finalise_summary(simulation)
         simulation.verbose && println("\033[1;32m\nDONE\033[0m")
-        simulation.verbose && println("-" ^ 50 * "\n")
+        simulation.verbose && println("-"^50 * "\n")
     end
     return nothing
 end
