@@ -1,8 +1,12 @@
-# MonteCarlo <img src="tdo_logo.png" alt="tdo" width="50"/>
+<div align="center">
 
-[![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
-[![CI](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo)
+  # MonteCarlo
+  [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
+  [![CI](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml)
+  [![codecov](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo)
+  
+  <img src="tdo_logo.png" alt="tdo" width="200"/>
+</div>
 
 ## Overview
 
