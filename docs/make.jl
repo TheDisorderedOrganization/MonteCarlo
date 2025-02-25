@@ -1,16 +1,16 @@
 using Documenter
-using MonteCarlo
+using Arianna
 
 readme = read(joinpath(@__DIR__, "..", "README.md"), String)
 readme_filtered = replace(readme, r"<.*?>" => "")
 write(joinpath(@__DIR__, "src", "index.md"), readme_filtered)
 
-makedocs(sitename="MonteCarlo",
+makedocs(sitename="Arianna",
     format=Documenter.HTML(
         prettyurls=(get(ENV, "CI", nothing) == "true"),
         size_threshold_ignore=["api.md"],
     ),
-    modules=[MonteCarlo],
+    modules=[Arianna],
 pages = [
     "Home" => "index.md",
     "Manual" => Any[
@@ -23,6 +23,6 @@ pages = [
 )
 
 deploydocs(
-    repo="https://github.com/TheDisorderedOrganization/MonteCarlo",
+    repo="https://github.com/TheDisorderedOrganization/Arianna",
     push_preview=true,
 )

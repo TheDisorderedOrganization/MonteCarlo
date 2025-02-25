@@ -1,6 +1,6 @@
 # Adding Your Own System
 
-Now that you understand how to run a Monte Carlo (MC) simulation, you may want to extend the framework by defining your own system. The [particle_1d.jl](https://github.com/TheDisorderedOrganization/MonteCarlo/example/particle_1d/particle_1d.jl)  file provides a minimal example of a system, which you can use as a reference when creating a new one.
+Now that you understand how to run a Monte Carlo (MC) simulation, you may want to extend the framework by defining your own system. The [particle_1d.jl](https://github.com/TheDisorderedOrganization/Arianna/example/particle_1d/particle_1d.jl)  file provides a minimal example of a system, which you can use as a reference when creating a new one.
 
 To define a new system, you need to specify its state variables, Monte Carlo moves and how to perform them. These components determine how the system evolves during the simulation. A system consists of:
 
@@ -18,7 +18,7 @@ end
 ```
 - Target density: This is the actual probablity distribution of the system that you want to sample. In this case it's the Boltzmann distribution at inverse temperature $\beta$
 ```julia
-function MonteCarlo.delta_log_target_density(e₁, e₂, system::Particle)
+function Arianna.delta_log_target_density(e₁, e₂, system::Particle)
     return -system.β * (e₂ - e₁)
 end
 ```
@@ -33,22 +33,22 @@ mutable struct Displacement{T<:AbstractFloat} <: Action
     δ::T
 end
 ```
-- Define how this action is sampled in the `MonteCarlo.sample_action!` function. In the example, the displacement length is sampled from a normal distribution.
+- Define how this action is sampled in the `Arianna.sample_action!` function. In the example, the displacement length is sampled from a normal distribution.
 ```julia
-function MonteCarlo.sample_action!(action::Displacement,::StandardGaussian, parameters, system::Particle, rng)
+function Arianna.sample_action!(action::Displacement,::StandardGaussian, parameters, system::Particle, rng)
     action.δ = rand(rng, Normal(zero(action.δ), parameters.σ))
     return nothing
 end
 ```
-- Specify the probablity of proposing the action in `MonteCarlo.log_proposal_density`. Note that this function must give the exact probability of sampling the action with `MonteCarlo.sample_action!`. In this case, we just need the density of the normal distribution.
+- Specify the probablity of proposing the action in `Arianna.log_proposal_density`. Note that this function must give the exact probability of sampling the action with `Arianna.sample_action!`. In this case, we just need the density of the normal distribution.
 ```julia
-function MonteCarlo.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
+function Arianna.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
     return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
 end
 ```
-- Finally, provide how this action changes the state of the system in the `MonteCarlo.perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. 
+- Finally, provide how this action changes the state of the system in the `Arianna.perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. 
 ```julia
-function MonteCarlo.perform_action!(system::Particle, action::Displacement)
+function Arianna.perform_action!(system::Particle, action::Displacement)
     e₁ = system.e
     system.x += action.δ
     system.e = potential(system.x)

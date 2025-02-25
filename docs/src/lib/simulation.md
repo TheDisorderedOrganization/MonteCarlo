@@ -3,20 +3,20 @@
 ## Simulation Structure
 
 ```@docs
-MonteCarlo.Simulation
+Arianna.Simulation
 ```
 ## What is an algorithm ?
 
 ```@docs
-MonteCarlo.Algorithm
-MonteCarlo.initialise
-MonteCarlo.make_step!
-MonteCarlo.finalise
+Arianna.Algorithm
+Arianna.initialise
+Arianna.make_step!
+Arianna.finalise
 ```
 
 ## Run a simulation
 
 ```@docs
-MonteCarlo.run!
+Arianna.run!
 ```
 

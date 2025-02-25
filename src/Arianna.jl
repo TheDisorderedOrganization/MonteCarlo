@@ -1,9 +1,9 @@
 """
-    module MonteCarlo
+    module Arianna
 
-The `MonteCarlo` module provides a flexible and extensible framework for performing Monte Carlo simulations.
+The `Arianna` module provides a flexible and extensible framework for performing Monte Carlo simulations.
 """
-module MonteCarlo
+module Arianna
 
 using Random
 using Distributions

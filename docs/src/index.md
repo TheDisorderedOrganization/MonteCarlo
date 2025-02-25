@@ -5,15 +5,15 @@
   
 
 
-# MonteCarlo
+# Arianna
 
 *A system-agnostic approach to Monte Carlo simulations*
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
-[![CI](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/MonteCarlo/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/MonteCarlo)
+[![CI](https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/TheDisorderedOrganization/Arianna/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/Arianna)
 
-MonteCarlo is a flexible and extensible framework for Monte Carlo simulations. Instead of acting as a black-box simulator, it provides a modular structure where users define their own system and Monte Carlo "moves". The package includes some simple predefined systems for example purposes, and more complex systems are defined in other repos like [ParticlesMC](https://github.com/TheDisorderedOrganization/ParticlesMC).
+Arianna is a flexible and extensible framework for Monte Carlo simulations. Instead of acting as a black-box simulator, it provides a modular structure where users define their own system and Monte Carlo "moves". The package includes some simple predefined systems for example purposes, and more complex systems are defined in other repos like [ParticlesMC](https://github.com/TheDisorderedOrganization/ParticlesMC).
 
 ## Features
 
@@ -24,17 +24,17 @@ MonteCarlo is a flexible and extensible framework for Monte Carlo simulations. I
 
 ## Installation
 
-To install the MonteCarlo module, you can clone the repository and use the Julia package manager to add the module path to your environment.
+To install the Arianna module, you can clone the repository and use the Julia package manager to add the module path to your environment.
 
 ```sh
-git clone https://github.com/TheDisorderedOrganization/MonteCarlo.git
-cd MonteCarlo
+git clone https://github.com/TheDisorderedOrganization/Arianna.git
+cd Arianna
 julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 ```
 
 ## Usage
 
-MonteCarlo is designed to work with user-defined systems rather than providing predefined ones. However, to help users get started, we provide example cases such as [particle_1D.jl](https://github.com/TheDisorderedOrganization/MonteCarlo/blob/main/example/particle_1d/particle_1d.jl) in the [example](https://github.com/TheDisorderedOrganization/MonteCarlo/tree/main/example) folder. Once you have defined your system and the associated moves, MonteCarlo allows you to run Monte Carlo simulations and store relevant data. The following Julia script illustrates how to set up and execute a general simulation in the [particle_1D.jl](https://github.com/TheDisorderedOrganization/MonteCarlo/blob/main/example/particle_1d/particle_1d.jl) example.
+Arianna is designed to work with user-defined systems rather than providing predefined ones. However, to help users get started, we provide example cases such as [particle_1D.jl](https://github.com/TheDisorderedOrganization/Arianna/blob/main/example/particle_1d/particle_1d.jl) in the [example](https://github.com/TheDisorderedOrganization/Arianna/tree/main/example) folder. Once you have defined your system and the associated moves, Arianna allows you to run Monte Carlo simulations and store relevant data. The following Julia script illustrates how to set up and execute a general simulation in the [particle_1D.jl](https://github.com/TheDisorderedOrganization/Arianna/blob/main/example/particle_1d/particle_1d.jl) example.
 
 ```julia
 include("example/particle_1D/particle_1d.jl")
@@ -65,11 +65,11 @@ We welcome contributions from the community. If you have a new system or feature
 
 ## Citing
 
-If you use MonteCarlo in your research, please cite it! You can find the citation information in the [CITATION](https://github.com/TheDisorderedOrganization/MonteCarlo/blob/main/CITATION.cff) file or directly through GitHub’s "Cite this repository" button.
+If you use Arianna in your research, please cite it! You can find the citation information in the [CITATION](https://github.com/TheDisorderedOrganization/Arianna/blob/main/CITATION.cff) file or directly through GitHub’s "Cite this repository" button.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0.  License. See the [LICENSE](https://github.com/TheDisorderedOrganization/MonteCarlo/blob/main/LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0.  License. See the [LICENSE](https://github.com/TheDisorderedOrganization/Arianna/blob/main/LICENSE) file for details.
 
 ## Contact
 

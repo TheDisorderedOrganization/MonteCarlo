@@ -1,10 +1,10 @@
 # API
 
-This is the documentation of the MonteCarlo module's functions, types and structures.
+This is the documentation of the Arianna module's functions, types and structures.
 
 ```@contents
 Pages = [
-    "montecarlo.md",
+    "Arianna.md",
     "simulation.md",
 ]
 Depth = 1

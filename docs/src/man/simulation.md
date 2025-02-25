@@ -1,6 +1,6 @@
 # Running a Monte Carlo Simulation
 
-To perform a Monte Carlo (MC) simulation, it is necessary to define the system and the set of possible moves, followed by executing the simulation using the appropriate functions. Below, we present a basic Monte Carlo simulation utilizing the Particle system and move set defined in [particle_1d.jl](https://github.com/TheDisorderedOrganization/MonteCarlo/example/particle_1d/particle_1d.jl) 
+To perform a Monte Carlo (MC) simulation, it is necessary to define the system and the set of possible moves, followed by executing the simulation using the appropriate functions. Below, we present a basic Monte Carlo simulation utilizing the Particle system and move set defined in [particle_1d.jl](https://github.com/TheDisorderedOrganization/Arianna/example/particle_1d/particle_1d.jl) 
 
 The Particle system is characterized by three key quantities: its position  $x$, the inverse temperature  $\beta$, and its energy $e$. The Monte Carlo move applied to the particle consists of a displacement by  $\delta$, where  $\delta$  is sampled from a user-defined probability distribution that we call policy.
 

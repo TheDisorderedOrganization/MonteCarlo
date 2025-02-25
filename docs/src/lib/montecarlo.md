@@ -1,5 +1,5 @@
-# MonteCarlo module
+# Arianna module
 
 ```@docs
-MonteCarlo
+Arianna
 ```

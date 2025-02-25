@@ -1,11 +1,11 @@
 module EnzymeExt
 
-using MonteCarlo
+using Arianna
 using Enzyme
 
-struct Enzyme_Backend <: MonteCarlo.PolicyGuided.AD_Backend end
+struct Enzyme_Backend <: Arianna.PolicyGuided.AD_Backend end
 
-function MonteCarlo.PolicyGuided.withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Enzyme_Backend;
+function Arianna.PolicyGuided.withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Enzyme_Backend;
     shadow=deepcopy(system)) where {T<:AbstractArray}
     _, logq = Enzyme.autodiff(
         Enzyme.ReverseWithPrimal,

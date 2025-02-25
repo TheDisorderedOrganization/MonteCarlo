@@ -2,7 +2,7 @@ abstract type AD_Backend end
 
 struct ForwardDiff_Backend <: AD_Backend end
 
-reward(action::Action, system) = MonteCarlo.raise_error("reward")
+reward(action::Action, system) = Arianna.raise_error("reward")
 
 function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::ForwardDiff_Backend;
     shadow=missing) where {T<:AbstractArray}
