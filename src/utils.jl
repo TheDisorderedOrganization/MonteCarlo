@@ -200,10 +200,12 @@ function StoreLastFrames(chains; path=missing, fmt=DAT(), extras...)
     return StoreLastFrames(chains, path, fmt)
 end
 
+store_lastframe(io, system, t, fmt::Format) = store_trajectory(io, system, t, fmt)
+
 function finalise(algorithm::StoreLastFrames, simulation::Simulation)
     for c in eachindex(simulation.chains)
         open(algorithm.paths[c], "w") do file
-            store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
+            store_lastframe(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
     return nothing
@@ -226,6 +228,8 @@ function StoreBackups(chains; path=missing, fmt=DAT(), store_first=false, store_
     return StoreBackups(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
+store_backup(io, system, t, fmt::Format) = store_trajectory(io, system, t, fmt)
+
 function initialise(algorithm::StoreBackups, simulation::Simulation)
     algorithm.store_first && make_step!(simulation, algorithm)
     return nothing
@@ -234,7 +238,7 @@ end
 function make_step!(simulation::Simulation, algorithm::StoreBackups)
     for c in eachindex(simulation.chains)
         open(joinpath(algorithm.dirs[c], "restart_t$(simulation.t)$(algorithm.fmt.extension)"), "w") do file
-            store_trajectory(file, simulation.chains[c], simulation.t, algorithm.fmt)
+            store_backup(file, simulation.chains[c], simulation.t, algorithm.fmt)
         end
     end
 end
