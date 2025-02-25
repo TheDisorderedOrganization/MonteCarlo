@@ -1,6 +1,16 @@
-using Documenter, MonteCarlo
+using Documenter
+using MonteCarlo
+
+readme = read(joinpath(@__DIR__, "..", "README.md"), String)
+readme_filtered = replace(readme, r"<.*?>" => "")
+write(joinpath(@__DIR__, "src", "index.md"), readme_filtered)
 
 makedocs(sitename="MonteCarlo",
+    format=Documenter.HTML(
+        prettyurls=(get(ENV, "CI", nothing) == "true"),
+        size_threshold_ignore=["api.md"],
+    ),
+    modules=[MonteCarlo],
 pages = [
     "Home" => "index.md",
     "Manual" => Any[
@@ -10,4 +20,9 @@ pages = [
     "API" => "lib/api.md",
 
 ],
+)
+
+deploydocs(
+    repo="https://github.com/TheDisorderedOrganization/MonteCarlo",
+    push_preview=true,
 )
