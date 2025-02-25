@@ -1,10 +1,8 @@
 <h1 align="center">
   <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/Arianna/main/logo.png" width="500"/>
-</h1><br>
+</h1>
 
-<h1 align="center">
-  <small><i>A system-agnostic approach to Monte Carlo simulations</i></small>
-</h1><br>
+<p align="center"><i>A system-agnostic approach to Monte Carlo simulations</i></p>
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
 [![CI](https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml)
