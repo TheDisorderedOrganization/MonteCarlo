@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/MonteCarlo/main/tdo_logo.png" width="200"/>
+  <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/MonteCarlo/main/logo.png" width="200"/>
   <br><br>
   
 </div>
