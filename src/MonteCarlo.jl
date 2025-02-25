@@ -14,7 +14,7 @@ using Dates
 using Printf
 
 include("simulation.jl")
-include("utils.jl")
+include("algorithms.jl")
 include("metropolis.jl")
 
 export Action, Policy, Move
