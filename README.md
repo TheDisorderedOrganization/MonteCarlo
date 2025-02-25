@@ -1,6 +1,9 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/Arianna/main/logo.png" width="500"/><br>
-  <small style="font-size: 50%;"><i>A system-agnostic approach to Monte Carlo simulations</i></small>
+  <img src="https://raw.githubusercontent.com/TheDisorderedOrganization/Arianna/main/logo.png" width="500"/>
+</h1><br>
+
+<h1 align="center">
+  <small><i>A system-agnostic approach to Monte Carlo simulations</i></small>
 </h1><br>
 
 [![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
