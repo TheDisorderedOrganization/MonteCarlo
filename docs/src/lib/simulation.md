@@ -4,6 +4,7 @@
 
 ```@docs
 Arianna.Simulation
+Arianna.build_schedule
 ```
 ## What is an algorithm ?
 
@@ -12,6 +13,7 @@ Arianna.Algorithm
 Arianna.initialise
 Arianna.make_step!
 Arianna.finalise
+Arianna.write_algorithm
 ```
 
 ## Run a simulation

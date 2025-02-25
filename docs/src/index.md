@@ -65,7 +65,7 @@ We welcome contributions from the community. If you have a new system or feature
 
 ## Citing
 
-If you use Arianna in your research, please cite it! You can find the citation information in the [CITATION](https://github.com/TheDisorderedOrganization/Arianna/blob/main/CITATION.cff) file or directly through GitHub’s "Cite this repository" button.
+If you use Arianna in your research, please cite it! You can find the citation information in the [CITATION](https://github.com/TheDisorderedOrganization/Arianna/blob/main/CITATION.bib) file or directly through GitHub’s "Cite this repository" button.
 
 ## License
 

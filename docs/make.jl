@@ -10,7 +10,7 @@ makedocs(sitename="Arianna",
         prettyurls=(get(ENV, "CI", nothing) == "true"),
         size_threshold_ignore=["api.md"],
     ),
-    modules=[Arianna],
+    #modules=[Arianna],
 pages = [
     "Home" => "index.md",
     "Manual" => Any[
@@ -18,11 +18,10 @@ pages = [
         "man/simulation.md",
     ],
     "API" => "lib/api.md",
-
 ],
 )
 
-deploydocs(
-    repo="https://github.com/TheDisorderedOrganization/Arianna",
-    push_preview=true,
-)
+# deploydocs(
+#     repo="https://github.com/TheDisorderedOrganization/Arianna",
+#     push_preview=true,
+# )
