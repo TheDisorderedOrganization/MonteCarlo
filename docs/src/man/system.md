@@ -16,14 +16,14 @@ mutable struct Particle{T<:AbstractFloat}
     e::T
 end
 ```
-- Target density: This is the actual probablity distribution of the system that you want to sample. In this case it's the Boltzmann distribution at inverse temperature $\beta$
+- Target density ratio: This is the log-density ratio of the system before and after a Monte Carlo move. It is needed to determine the acceptance probability in the Metropolis algorithm. In this case the target is the Boltzmann distribution at inverse temperature $\beta$.
 ```julia
 function Arianna.delta_log_target_density(e₁, e₂, system::Particle)
     return -system.β * (e₂ - e₁)
 end
 ```
 
-## Monte Carlo action
+## Monte Carlo move
 
 **Specify how the system state changes during the simulation**
 
@@ -33,20 +33,20 @@ mutable struct Displacement{T<:AbstractFloat} <: Action
     δ::T
 end
 ```
-- Define how this action is sampled in the `Arianna.sample_action!` function. In the example, the displacement length is sampled from a normal distribution.
+- Define how this action is sampled in the `sample_action!` function. In the example, the displacement length is sampled from a normal distribution.
 ```julia
 function Arianna.sample_action!(action::Displacement,::StandardGaussian, parameters, system::Particle, rng)
     action.δ = rand(rng, Normal(zero(action.δ), parameters.σ))
     return nothing
 end
 ```
-- Specify the probablity of proposing the action in `Arianna.log_proposal_density`. Note that this function must give the exact probability of sampling the action with `Arianna.sample_action!`. In this case, we just need the density of the normal distribution.
+- Specify the probablity of proposing the action in `log_proposal_density`. Note that this function must give the exact probability of sampling the action with `sample_action!`. In this case, we just need the density of the normal distribution.
 ```julia
 function Arianna.log_proposal_density(action::Displacement, ::StandardGaussian, parameters, system::Particle)
     return -(action.δ)^2 / (2parameters.σ^2) - log(2π * parameters.σ^2) / 2
 end
 ```
-- Finally, provide how this action changes the state of the system in the `Arianna.perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. 
+- Finally, provide how this action changes the state of the system in the `perform_action!` function. In the example, performing the displacement updates the position and the energy of the particle. Note that `perform_action!` returns information on the state of the system before and after the action. This doesn't have to be the whole system, but just the part relevant for evaluating the density ratio in `delta_log_target_density`.
 ```julia
 function Arianna.perform_action!(system::Particle, action::Displacement)
     e₁ = system.e
