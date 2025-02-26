@@ -18,7 +18,7 @@ end
 System(x, β) = Particle(x, β)
 
 function Arianna.unnormalised_log_target_density(state, ::Particle)
-    return -state[2] * state[1]
+    return -state[1] * state[2]
 end
 
 ###############################################################################
