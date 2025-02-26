@@ -17,8 +17,8 @@ end
 
 System(x, β) = Particle(x, β)
 
-function Arianna.delta_log_target_density(e₁, e₂, system::Particle)
-    return -system.β * (e₂ - e₁)
+function Arianna.unnormalised_log_target_density(state, ::Particle)
+    return -state[1] * state[2]
 end
 
 ###############################################################################
@@ -31,7 +31,7 @@ function Arianna.perform_action!(system::Particle, action::Displacement)
     e₁ = system.e
     system.x += action.δ
     system.e = potential(system.x)
-    return e₁, system.e
+    return (e₁, system.β), (system.e, system.β)
 end
 
 function Arianna.invert_action!(action::Displacement, system::Particle)

@@ -16,10 +16,10 @@ mutable struct Particle{T<:AbstractFloat}
     e::T
 end
 ```
-- Target density ratio: This is the log-density ratio of the system before and after a Monte Carlo move. It is needed to determine the acceptance probability in the Metropolis algorithm. In this case the target is the Boltzmann distribution at inverse temperature $\beta$.
+- Target density: This is the (unnormalised) log-density of the system. In this case it's simply the Boltzmann distribution at inverse temperature $\beta$. Note that it takes a generic state as input instead of the whole system object. This is better for performance, as generally the density only depends on a few properties of the system. In this case `state` is a tuple defined as `(e, β)`.
 ```julia
-function Arianna.delta_log_target_density(e₁, e₂, system::Particle)
-    return -system.β * (e₂ - e₁)
+function Arianna.unnormalised_log_target_density(state, ::Particle)
+    return -state[1] * state[2]
 end
 ```
 
@@ -52,7 +52,7 @@ function Arianna.perform_action!(system::Particle, action::Displacement)
     e₁ = system.e
     system.x += action.δ
     system.e = potential(system.x)
-    return e₁, system.e
+    return (e₁, system.β), (system.e, system.β)
 end
 ```
 
