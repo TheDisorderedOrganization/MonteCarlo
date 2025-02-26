@@ -1,5 +1,0 @@
-# Arianna module
-
-```@docs
-Arianna
-```

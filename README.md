@@ -33,6 +33,7 @@ Arianna is designed to work with user-defined systems rather than providing pred
 
 ```julia
 include("example/particle_1D/particle_1d.jl")
+
 x₀ = 0.0
 β = 2.0
 M = 10
@@ -52,7 +53,7 @@ algorithm_list = (
 simulation = Simulation(chains, algorithm_list, steps; path=path, verbose=true)
 run!(simulation)
 ```
-This implementation employs the **Metropolis algorithm** for Monte Carlo sampling of multiple independent chains, using Gaussian-distributed displacements as the proposed moves. The simulation records energy and acceptance statistics while storing particle trajectories for analysis. The resulting data is saved in the specified output directory for further evaluation.
+This implementation employs the **Metropolis algorithm** for Monte Carlo sampling of multiple independent chains, using Gaussian-distributed displacements as proposed moves. The simulation records energy and acceptance statistics while storing particle trajectories for analysis. The resulting data is saved in the specified output directory for further evaluation.
 
 ## Contributing
 
