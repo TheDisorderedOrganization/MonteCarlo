@@ -48,7 +48,7 @@ function pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray
     ∇logq_backward .= zero(parameters)
     logq_forward = withgrad_log_proposal_density!(∇logq_forward, action, policy, parameters, system, ad_backend; shadow=shadow)
     x₁, x₂ = perform_action!(system, action)
-    Δlogp = delta_log_target_density(x₁, x₂)
+    Δlogp = delta_log_target_density(x₁, x₂, system)
     r = reward(action, system)
     invert_action!(action, system)
     logq_backward = withgrad_log_proposal_density!(∇logq_backward, action, policy, parameters, system, ad_backend; shadow=shadow)

@@ -18,7 +18,7 @@ end
 ```
 - Target density: This is the (unnormalised) log-density of the system. In this case it's simply the Boltzmann distribution at inverse temperature $\beta$. Note that it takes a generic state as input instead of the whole system object. This is better for performance, as generally the density only depends on a few properties of the system. In this case `state` is a tuple defined as `(e, β)`.
 ```julia
-function Arianna.unnormalised_log_target_density(state)
+function Arianna.unnormalised_log_target_density(state, ::Particle)
     return -state[2] * state[1]
 end
 ```

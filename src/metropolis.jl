@@ -2,11 +2,12 @@ abstract type Action end
 
 abstract type Policy end
 
+raise_error(s) = error("No $s is defined")
 sample_action!(action::Action, policy::Policy, parameters, system, rng) = raise_error("sample_action!")
 log_proposal_density(action, policy, parameters, system) = raise_error("log_proposal_density")
 perform_action!(system, action::Action) = raise_error("perform_action!")
-unnormalised_log_target_density(x) = raise_error("unnormalised_log_target_density")
-delta_log_target_density(x₁, x₂) = unnormalised_log_target_density(x₂) - unnormalised_log_target_density(x₁)
+unnormalised_log_target_density(x, system) = raise_error("unnormalised_log_target_density")
+delta_log_target_density(x₁, x₂, system) = unnormalised_log_target_density(x₂, system) - unnormalised_log_target_density(x₁, system)
 invert_action!(action::Action, system) = raise_error("invert_action!")
 perform_action_cached!(system, action::Action) = perform_action!(system, action)
 
@@ -27,7 +28,7 @@ function mc_step!(system, action::Action, policy::Policy, parameters::AbstractAr
     sample_action!(action, policy, parameters, system, rng)
     logq_forward = log_proposal_density(action, policy, parameters, system)
     x₁, x₂ = perform_action!(system, action)
-    Δlogp = delta_log_target_density(x₁, x₂)
+    Δlogp = delta_log_target_density(x₁, x₂, system)
     invert_action!(action, system)
     logq_backward = log_proposal_density(action, policy, parameters, system)
     α = min(one(T), exp(Δlogp + logq_backward - logq_forward))
