@@ -1,16 +1,142 @@
+"""
+    abstract type Action
+
+Abstract type representing Monte Carlo actions/moves that can be performed on a system.
+
+Concrete subtypes must implement:
+- `sample_action!(action, policy, parameters, system, rng)`: Sample a new action from the policy
+- `perform_action!(system, action)`: Apply the action to modify the system state
+- `invert_action!(action, system)`: Invert/reverse the action
+- `log_proposal_density(action, policy, parameters, system)`: Log probability density of proposing this action
+
+Optional methods:
+- `perform_action_cached!(system, action)`: Optimized version of perform_action! that can reuse cached values
+"""
 abstract type Action end
 
+"""
+    abstract type Policy
+
+Abstract type representing proposal policies for Monte Carlo actions.
+
+A Policy defines how actions are sampled and their proposal probabilities are calculated.
+Concrete subtypes work together with specific Action types to implement the proposal mechanism.
+"""
 abstract type Policy end
 
+"""
+    raise_error(s)
+
+Helper function to raise errors for unimplemented required methods.
+
+# Arguments
+- `s`: String describing the missing method implementation
+"""
 raise_error(s) = error("No $s is defined")
+
+"""
+    sample_action!(action::Action, policy::Policy, parameters, system, rng)
+
+Sample a new action from the policy.
+
+# Arguments
+- `action`: Action to be sampled
+- `policy`: Policy to sample from
+- `parameters`: Parameters of the policy
+- `system`: System the action will be applied to
+- `rng`: Random number generator
+"""
 sample_action!(action::Action, policy::Policy, parameters, system, rng) = raise_error("sample_action!")
+
+"""
+    log_proposal_density(action, policy, parameters, system)
+
+Calculate the log probability density of proposing the given action.
+
+# Arguments
+- `action`: Proposed action
+- `policy`: Policy used for proposal
+- `parameters`: Parameters of the policy
+- `system`: System the action is applied to
+"""
 log_proposal_density(action, policy, parameters, system) = raise_error("log_proposal_density")
+
+"""
+    perform_action!(system, action::Action)
+
+Apply the action to modify the system state.
+
+# Arguments
+- `system`: System to modify
+- `action`: Action to perform
+
+# Returns
+A tuple of (x₁, x₂) containing the old and new states
+"""
 perform_action!(system, action::Action) = raise_error("perform_action!")
+
+"""
+    unnormalised_log_target_density(x, system)
+
+Calculate the unnormalized log probability density of a system state.
+
+# Arguments
+- `x`: System state
+- `system`: System object
+"""
 unnormalised_log_target_density(x, system) = raise_error("unnormalised_log_target_density")
+"""
+    delta_log_target_density(x₁, x₂, system)
+
+Calculate the change in log target density between two states.
+
+# Arguments
+- `x₁`: Initial state
+- `x₂`: Final state
+- `system`: System object
+"""
 delta_log_target_density(x₁, x₂, system) = unnormalised_log_target_density(x₂, system) - unnormalised_log_target_density(x₁, system)
+"""
+    invert_action!(action::Action, system)
+
+Invert/reverse an action.
+
+# Arguments
+- `action`: Action to invert
+- `system`: System the action was applied to
+"""
 invert_action!(action::Action, system) = raise_error("invert_action!")
+
+"""
+    perform_action_cached!(system, action::Action)
+
+Optimized version of perform_action! that can reuse cached values.
+
+# Arguments
+- `system`: System to modify
+- `action`: Action to perform
+"""
 perform_action_cached!(system, action::Action) = perform_action!(system, action)
 
+"""
+    Move{A<:Action,P<:Policy,V<:AbstractArray,T<:AbstractFloat}
+
+A struct representing a Monte Carlo move with an associated action, policy, and parameters.
+
+# Fields
+- `action::A`: The action to be performed in the move
+- `policy::P`: The policy used to propose actions
+- `parameters::V`: Parameters of the policy
+- `weight::T`: Weight/probability of selecting this move in a sweep
+- `total_calls::Int`: Total number of times this move has been attempted
+- `accepted_calls::Int`: Number of times this move has been accepted
+
+# Type Parameters
+- `A`: Type of the action
+- `P`: Type of the policy
+- `V`: Type of the parameter array
+- `T`: Type of the weight (floating point)
+"""
 mutable struct Move{A<:Action,P<:Policy,V<:AbstractArray,T<:AbstractFloat}
     action::A
     policy::P
@@ -20,10 +146,33 @@ mutable struct Move{A<:Action,P<:Policy,V<:AbstractArray,T<:AbstractFloat}
     accepted_calls::Int
 end
 
+"""
+    Move(action, policy, parameters, weight)
+
+Create a new Move instance.
+
+# Arguments
+- `action`: The action to be performed in the move
+- `policy`: The policy used to propose actions
+- `parameters`: Parameters of the policy
+- `weight`: Weight/probability of selecting this move in a sweep
+"""
 function Move(action, policy, parameters, weight)
     return Move(action, policy, parameters, weight, 0, 0)
 end
 
+"""
+    mc_step!(system, action::Action, policy::Policy, parameters::AbstractArray{T}, rng) where {T<:AbstractFloat}
+
+Perform a single Monte Carlo step.
+
+# Arguments
+- `system`: System to modify
+- `action`: Action to perform
+- `policy`: Policy used for proposal
+- `parameters`: Parameters of the policy
+- `rng`: Random number generator
+"""
 function mc_step!(system, action::Action, policy::Policy, parameters::AbstractArray{T}, rng) where {T<:AbstractFloat}
     sample_action!(action, policy, parameters, system, rng)
     logq_forward = log_proposal_density(action, policy, parameters, system)
@@ -40,6 +189,17 @@ function mc_step!(system, action::Action, policy::Policy, parameters::AbstractAr
     end
 end
 
+"""
+    mc_sweep!(system, pool, rng; mc_steps=1)
+
+Perform a Monte Carlo sweep over a pool of moves.
+
+# Arguments
+- `system`: System to modify
+- `pool`: Pool of moves to perform sweeps over
+- `rng`: Random number generator
+- `mc_steps`: Number of Monte Carlo steps per sweep
+"""
 function mc_sweep!(system, pool, rng; mc_steps=1)
     weights = [move.weight for move in pool]
     for _ in 1:mc_steps
@@ -51,6 +211,24 @@ function mc_sweep!(system, pool, rng; mc_steps=1)
     return nothing
 end
 
+"""
+    Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
+
+A struct representing a Metropolis Monte Carlo algorithm.
+
+# Fields
+- `pools::Vector{P}`: Vector of independent pools (one for each system)
+- `sweepstep::Int`: Number of Monte Carlo steps per sweep
+- `seed::Int`: Random number seed
+- `rngs::Vector{R}`: Vector of random number generators
+- `parallel::Bool`: Flag to parallelise over different threads
+- `collecter::C`: Transducer to collect results from parallelised loops
+
+# Type Parameters
+- `P`: Type of the pool
+- `R`: Type of the random number generator
+- `C`: Type of the transducer
+"""
 struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     sweepstep::Int              # Number of mc steps per mc sweep
@@ -90,11 +268,37 @@ struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
 
 end
 
+"""
+    Metropolis(chains; pool=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false, extras...)
+
+Create a new Metropolis instance.
+
+# Arguments
+- `chains`: Vector of chains to run the algorithm on
+- `pool`: Pool of moves to perform sweeps over
+- `sweepstep`: Number of Monte Carlo steps per sweep
+- `seed`: Random number seed
+- `R`: Type of the random number generator
+- `parallel`: Flag to parallelise over different threads
+- `extras`: Additional keyword arguments
+
+# Returns
+- `algorithm`: Metropolis instance
+"""
 function Metropolis(chains; pool=missing, sweepstep=1, seed=1, R=Xoshiro, parallel=false, extras...)
     pools = [deepcopy(pool) for _ in chains]
     return Metropolis(chains, pools; sweepstep=sweepstep, seed=seed, R=R, parallel=parallel)
 end
 
+"""
+    make_step!(simulation::Simulation, algorithm::Metropolis)
+
+Perform a single step of the Metropolis algorithm.
+
+# Arguments
+- `simulation`: Simulation to perform the step on
+- `algorithm`: Metropolis instance
+"""
 function make_step!(simulation::Simulation, algorithm::Metropolis)
     algorithm.collecter(
         eachindex(simulation.chains) |> Map(c -> begin
@@ -104,14 +308,41 @@ function make_step!(simulation::Simulation, algorithm::Metropolis)
     return nothing
 end
 
+"""
+    callback_acceptance(simulation)
+
+Calculate the mean acceptance rate of the Metropolis algorithm.
+
+# Arguments
+- `simulation`: Simulation to calculate the acceptance rate of
+"""
 function callback_acceptance(simulation)
     return mean([[move.accepted_calls / move.total_calls for move in pool] for pool in getproperty.(filter(x -> isa(x, Metropolis), simulation.algorithms), :pools)...])
 end
 
+"""
+    write_parameters(::Policy, parameters)
+
+Write the parameters of a policy to a string.
+
+# Arguments
+- `policy`: Policy to write the parameters of
+- `parameters`: Parameters of the policy
+"""
 function write_parameters(::Policy, parameters)
     return "$(collect(vec(parameters)))"
 end
 
+"""
+    write_algorithm(io, algorithm::Metropolis, scheduler)
+
+Write the algorithm to a string.
+
+# Arguments
+- `io`: IO stream to write to
+- `algorithm`: Algorithm to write
+- `scheduler`: Scheduler to write
+"""
 function write_algorithm(io, algorithm::Metropolis, scheduler)
     println(io, "\tMetropolis")
     println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
@@ -131,6 +362,21 @@ function write_algorithm(io, algorithm::Metropolis, scheduler)
     end
 end
 
+"""
+    StoreParameters{V<:AbstractArray} <: Algorithm
+
+A struct representing a parameter store.
+
+# Fields
+- `paths::Vector{String}`: Vector of paths to the parameter files
+- `files::Vector{IOStream}`: Vector of open file streams to the parameter files
+- `parameters_list::V`: List of parameters to store
+- `store_first::Bool`: Flag to store the parameters at the first step
+- `store_last::Bool`: Flag to store the parameters at the last step
+
+# Type Parameters
+- `V`: Type of the parameter array
+"""
 struct StoreParameters{V<:AbstractArray} <: Algorithm
     paths::Vector{String}
     files::Vector{IOStream}
@@ -154,7 +400,25 @@ struct StoreParameters{V<:AbstractArray} <: Algorithm
 
 end
 
+"""
+    StoreParameters(chains; dependencies=missing, path=missing, ids=missing, store_first=true, store_last=false, extras...)
+
+Create a new StoreParameters instance.
+
+# Arguments
+- `chains`: Vector of chains to store the parameters of
+- `dependencies`: Dependencies of the parameter store
+- `path`: Path to the parameter files
+- `ids`: IDs of the parameters to store
+- `store_first`: Flag to store the parameters at the first step
+- `store_last`: Flag to store the parameters at the last step
+- `extras`: Additional keyword arguments
+
+# Returns
+- `algorithm`: StoreParameters instance
+"""
 function StoreParameters(chains; dependencies=missing, path=missing, ids=missing, store_first=true, store_last=false, extras...)
+    @assert length(dependencies) == 1
     @assert length(dependencies) == 1
     @assert isa(dependencies[1], Metropolis)
     pool = dependencies[1].pools[1]

@@ -1,3 +1,8 @@
+"""
+    PolicyGuided
+
+Module for policy-guided Monte Carlo algorithms.
+"""
 module PolicyGuided
 
 using ..Arianna: Action, Policy, Algorithm, Simulation, Metropolis

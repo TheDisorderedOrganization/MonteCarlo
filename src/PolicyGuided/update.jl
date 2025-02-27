@@ -1,3 +1,16 @@
+"""
+    PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorithm
+
+Algorithm for updating policy parameters in Monte Carlo simulations.
+
+# Fields
+- `pools::Vector{P}`: Vector of independent pools (one for each system)
+- `optimisers::O`: List of optimisers (one for each move)
+- `learn_ids::Vector{Int}`: List of learnable moves
+- `parameters_list::VPR`: List of current parameters values (one array for each move)
+- `gradients_data::VG`: Gradient information (one for each move)
+"""
+
 struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     optimisers::O               # List of optimisers (one for each move)

@@ -1,3 +1,40 @@
+"""
+    PolicyGradientEstimator{P,O,VPL,VPR,VO,VG,VC,VL,ADB,R,C} <: Algorithm
+
+A struct representing a policy gradient estimator for Monte Carlo algorithms.
+
+# Fields
+- `pools::Vector{P}`: Vector of independent pools (one for each system)
+- `optimisers::O`: List of optimisers (one for each move)
+- `learn_ids::Vector{Int}`: List of learnable moves
+- `q_batch_size::Int`: Number of independent samples generated from proposal distributions
+- `policy_list::VPL`: List of policies (one for each move)
+- `parameters_list::VPR`: List of current parameters values (one array for each move)
+- `objectives::VO`: Cache for estimated objective functions Ĵ (one for each move)
+- `gradients_data::VG`: Gradient information (one for each move)
+- `chains_shadow::VC`: Copy of chains (for Enzyme)
+- `∇logqs_forward::VL`: Preallocated forward gradients (one array for each move)
+- `∇logqs_backward::VL`: Preallocated backward gradients (one array for each move)
+- `ad_backend::ADB`: Backend for automatic differentiation (Enzyme or Zygote)
+- `seed::Int`: Random number seed
+- `rngs::Vector{R}`: Vector of random number generators
+- `parallel::Bool`: Flag to parallelise over different threads
+- `reducer::C`: Transducer to reduce results from parallelised loops
+
+# Type Parameters
+- `P`: Type of the pool
+- `O`: Type of the optimisers
+- `VPL`: Type of the policy list
+- `VPR`: Type of the parameter list
+- `VO`: Type of the objectives array
+- `VG`: Type of the gradients data
+- `VC`: Type of the chains shadow
+- `VL`: Type of the gradient arrays
+- `ADB`: Type of the automatic differentiation backend
+- `R`: Type of the random number generator
+- `C`: Type of the reducer function
+"""
+
 struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:AbstractArray,VG<:AbstractArray,VC<:AbstractArray,VL<:AbstractArray,ADB<:AD_Backend,R<:AbstractRNG,C<:Function} <: Algorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     optimisers::O               # List of optimisers (one for each move)

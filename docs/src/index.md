@@ -1,11 +1,21 @@
 # Arianna
  *A system-agnostic approach to Monte Carlo simulations*
 
-[![License](https://img.shields.io/badge/license-GPL%203.0-red.svg)](https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE)
-[![CI](https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml/badge.svg)](https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/TheDisorderedOrganization/Arianna/graph/badge.svg?token=URGL1HJOOI)](https://codecov.io/gh/TheDisorderedOrganization/Arianna)
+<p align="center">
+  <a href="https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-GPL%203.0-red.svg" alt="License">
+  </a>
+  <a href="https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml">
+    <img src="https://github.com/TheDisorderedOrganization/Arianna/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://codecov.io/gh/TheDisorderedOrganization/Arianna">
+    <img src="https://codecov.io/gh/TheDisorderedOrganization/Arianna/graph/badge.svg?token=URGL1HJOOI" alt="codecov">
+  </a>
+</p>
 
-Arianna is a flexible and extensible framework for Monte Carlo simulations. Instead of acting as a black-box simulator, it provides a modular structure where users define their own system and Monte Carlo "moves". The package includes some simple predefined systems for example purposes, and more complex systems are defined in other repos like [ParticlesMC](https://github.com/TheDisorderedOrganization/ParticlesMC).
+<p align="center">
+Arianna is a flexible and extensible framework for Monte Carlo simulations. Instead of acting as a black-box simulator, it provides a modular structure where users define their own system and Monte Carlo "moves". The package includes some simple predefined systems for example purposes, and more complex systems are defined in other repos like <a href="https://github.com/TheDisorderedOrganization/ParticlesMC">ParticlesMC</a>.
+</p>
 
 ## Features
 
