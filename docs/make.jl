@@ -15,6 +15,7 @@ makedocs(sitename="Arianna",
 pages = [
     "Home" => "index.md",
     "Manual" => Any[
+        "man/montecarlo.md",
         "man/system.md",
         "man/simulation.md",
     ],
