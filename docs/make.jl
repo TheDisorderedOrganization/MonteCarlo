@@ -2,8 +2,10 @@ using Documenter
 using Arianna
 
 readme = read(joinpath(@__DIR__, "..", "README.md"), String)
-readme_filtered = "# Arianna\n *A system-agnostic approach to Monte Carlo simulations*" * replace(readme, r"<h1[\s\S]*?</p>*" => "")
-write(joinpath(@__DIR__, "src", "index.md"), readme_filtered)
+readme = replace(readme, r"<.*?>" => "")
+readme = readme[findfirst("Arianna", readme)[1]:end]
+readme = "# Arianna\n *A system-agnostic approach to Monte Carlo simulations*" * readme
+write(joinpath(@__DIR__, "src", "index.md"), readme)
 
 makedocs(sitename="Arianna",
     format=Documenter.HTML(
