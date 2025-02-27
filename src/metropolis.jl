@@ -329,6 +329,20 @@ Write the parameters of a policy to a string.
 - `policy`: Policy to write the parameters of
 - `parameters`: Parameters of the policy
 """
+function write_parameters(::Policy, parameters)
+    return "$(collect(vec(parameters)))"
+end
+
+"""
+    write_algorithm(io, algorithm::Metropolis, scheduler)
+
+Write the algorithm to a string.
+
+# Arguments
+- `io`: IO stream to write to
+- `algorithm`: Algorithm to write
+- `scheduler`: Scheduler to write
+"""
 function write_algorithm(io, algorithm::Metropolis, scheduler)
     println(io, "\tMetropolis")
     println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
