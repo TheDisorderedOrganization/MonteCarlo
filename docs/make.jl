@@ -14,9 +14,8 @@ makedocs(
         size_threshold_ignore = ["api.md"],
         sidebar_sitename = false
     ),
-    modules = [Arianna],
+    #modules = [Arianna],
     doctest = false,
-    warnonly = [:missing_docs],
     pages = [
         "Home" => "index.md",
         "Manual" => Any[
