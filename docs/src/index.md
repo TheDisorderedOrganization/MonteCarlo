@@ -14,14 +14,14 @@
 To install the Arianna module, you can clone the repository and use the Julia package manager to add the module path to your environment.
 
 ```sh
-git clone https://github.com/TheDisorderedOrganization/Arianna.git
+git clone https://github.com/TheDisorderedOrganization/Arianna.jl.git
 cd Arianna
 julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 ```
 
 ## Usage
 
-Arianna is designed to work with user-defined systems rather than providing predefined ones. However, to help users get started, we provide example cases such as [particle_1D.jl](https://github.com/TheDisorderedOrganization/Arianna/blob/main/example/particle_1d/particle_1d.jl) in the [example](https://github.com/TheDisorderedOrganization/Arianna/tree/main/example) folder. Once you have defined your system and the associated moves, Arianna allows you to run Monte Carlo simulations and store relevant data. The following Julia script illustrates how to set up and execute a general simulation in the [particle_1D.jl](https://github.com/TheDisorderedOrganization/Arianna/blob/main/example/particle_1d/particle_1d.jl) example.
+Arianna is designed to work with user-defined systems rather than providing predefined ones. However, to help users get started, we provide example cases such as [particle_1D.jl](https://github.com/TheDisorderedOrganization/Arianna.jl/blob/main/example/particle_1d/particle_1d.jl) in the [example](https://github.com/TheDisorderedOrganization/Arianna.jl/tree/main/example) folder. Once you have defined your system and the associated moves, Arianna allows you to run Monte Carlo simulations and store relevant data. The following Julia script illustrates how to set up and execute a general simulation in the [particle_1D.jl](https://github.com/TheDisorderedOrganization/Arianna.jl/blob/main/example/particle_1d/particle_1d.jl) example.
 
 ```julia
 include("example/particle_1D/particle_1d.jl")
@@ -53,11 +53,11 @@ We welcome contributions from the community. If you have a new system or feature
 
 ## Citing
 
-If you use Arianna in your research, please cite it! You can find the citation information in the [CITATION](https://github.com/TheDisorderedOrganization/Arianna/blob/main/CITATION.bib) file or directly through GitHub’s "Cite this repository" button.
+If you use Arianna in your research, please cite it! You can find the citation information in the [CITATION](https://github.com/TheDisorderedOrganization/Arianna.jl/blob/main/CITATION.bib) file or directly through GitHub’s "Cite this repository" button.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0.  License. See the [LICENSE](https://github.com/TheDisorderedOrganization/Arianna/blob/main/LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0.  License. See the [LICENSE](https://github.com/TheDisorderedOrganization/Arianna.jl/blob/main/LICENSE) file for details.
 
 ## Contact
 
