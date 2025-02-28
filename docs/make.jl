@@ -9,9 +9,9 @@ write(joinpath(@__DIR__, "src", "index.md"), readme)
 
 makedocs(sitename="Arianna",
         format = Documenter.HTML(
-                        prettyurls=(get(ENV, "CI", nothing) == "true"),
-                        size_threshold_ignore=["api.md"],
-                        sidebar_sitename=false,
+                        #prettyurls=(get(ENV, "CI", nothing) == "true"),
+                        #size_threshold_ignore=["api.md"],
+                        #sidebar_sitename=false,
                 ),
         modules = [Arianna],
         pages = [
