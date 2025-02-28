@@ -19,8 +19,8 @@ pages = [
     "Manual" => Any[
         "man/montecarlo.md",
         "man/system.md",
-        "man/simulation.md",
     ],
+    "Related packages" => "related.md",
     "API" => "api.md",
 ],
 )
