@@ -13,19 +13,19 @@ Backend for automatic differentiation using ForwardDiff.jl.
 struct ForwardDiff_Backend <: AD_Backend end
 
 """
-    reward(action::Action, system)
+    reward(action::Action, system::AriannaSystem)
 
 Compute the reward for an action in a given system.
 """
-reward(action::Action, system) = Arianna.raise_error("reward")
+reward(action::Action, system::AriannaSystem) = Arianna.raise_error("reward")
 
 """
-    withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::ForwardDiff_Backend;
+    withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system::AriannaSystem, ::ForwardDiff_Backend;
     shadow=missing) where {T<:AbstractArray}
 
 Compute the gradient of the log proposal density for an action in a given system using ForwardDiff.jl.
 """
-function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::ForwardDiff_Backend;
+function withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system::AriannaSystem, ::ForwardDiff_Backend;
     shadow=missing) where {T<:AbstractArray}
     logq = log_proposal_density(action, policy, parameters, system)
     ∇logq .= ForwardDiff.gradient(p -> log_proposal_density(action, policy, p, system), parameters)
@@ -85,12 +85,12 @@ function average(gd::GradientData)
 end
 
 """
-    pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray{T}, system;
+    pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray{T}, system::AriannaSystem;
     ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=ForwardDiff_Backend()) where {T<:AbstractFloat}
 
 Estimate the gradient of the objective function using policy gradient Monte Carlo.
 """
-function pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray{T}, system;
+function pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray{T}, system::AriannaSystem;
     ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=ForwardDiff_Backend()) where {T<:AbstractFloat}
     ∇logq_forward .= zero(parameters)
     ∇logq_backward .= zero(parameters)
@@ -109,12 +109,12 @@ function pgmc_estimate(action::Action, policy::Policy, parameters::AbstractArray
 end
 
 """
-    sample_gradient_data(action::Action, policy::Policy, parameters::AbstractArray, system, rng;
+    sample_gradient_data(action::Action, policy::Policy, parameters::AbstractArray, system::AriannaSystem, rng;
     ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=ForwardDiff_Backend())
 
 Sample gradient data for a given action, policy, parameters, and system.
 """
-function sample_gradient_data(action::Action, policy::Policy, parameters::AbstractArray, system, rng;
+function sample_gradient_data(action::Action, policy::Policy, parameters::AbstractArray, system::AriannaSystem, rng;
     ∇logq_forward=zero(parameters), ∇logq_backward=zero(parameters), shadow=deepcopy(system), ad_backend::AD_Backend=ForwardDiff_Backend())
     sample_action!(action, policy, parameters, system, rng)
     return pgmc_estimate(action, policy, parameters, system; ∇logq_forward=∇logq_forward, ∇logq_backward=∇logq_backward, shadow=shadow, ad_backend=ad_backend)

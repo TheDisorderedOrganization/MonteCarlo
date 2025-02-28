@@ -6,7 +6,7 @@ using ComponentArrays
 
 ###############################################################################
 ## SYSTEM
-mutable struct Particle{T<:AbstractFloat}
+mutable struct Particle{T<:AbstractFloat} <: AriannaSystem
     x::T
     β::T
     e::T

@@ -179,11 +179,11 @@ function StoreTrajectories(chains; path=missing, fmt=DAT(), store_first=true, st
 end
 
 """
-    store_trajectory(io, system, t, fmt::Format)
+    store_trajectory(io, system::AriannaSystem, t, fmt::Format)
 
 Store the system trajectory at time t to the given IO stream in the specified format.
 """
-function store_trajectory(io, system, t, fmt::Format)
+function store_trajectory(io, system::AriannaSystem, t, fmt::Format)
     println(io, "$t, $system")
     return nothing
 end
@@ -235,7 +235,7 @@ function StoreLastFrames(chains; path=missing, fmt=DAT(), extras...)
     return StoreLastFrames(chains, path, fmt)
 end
 
-store_lastframe(io, system, t, fmt::Format) = store_trajectory(io, system, t, fmt)
+store_lastframe(io, system::AriannaSystem, t, fmt::Format) = store_trajectory(io, system, t, fmt)
 """
     store_lastframe(io, system, t, fmt::Format)
 
@@ -278,7 +278,7 @@ function StoreBackups(chains; path=missing, fmt=DAT(), store_first=false, store_
     return StoreBackups(chains, path, fmt, store_first=store_first, store_last=store_last)
 end
 
-store_backup(io, system, t, fmt::Format) = store_trajectory(io, system, t, fmt)
+store_backup(io, system::AriannaSystem, t, fmt::Format) = store_trajectory(io, system, t, fmt)
 """
     store_backup(io, system, t, fmt::Format)
 
