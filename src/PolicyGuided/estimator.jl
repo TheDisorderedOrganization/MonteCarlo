@@ -1,5 +1,5 @@
 """
-    PolicyGradientEstimator{P,O,VPL,VPR,VO,VG,VC,VL,ADB,R,C} <: Algorithm
+    PolicyGradientEstimator{P,O,VPL,VPR,VO,VG,VC,VL,ADB,R,C} <: AlgoritAriannaAlgorithm
 
 A struct representing a policy gradient estimator for Monte Carlo algorithms.
 
@@ -35,7 +35,7 @@ A struct representing a policy gradient estimator for Monte Carlo algorithms.
 - `C`: Type of the reducer function
 """
 
-struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:AbstractArray,VG<:AbstractArray,VC<:AbstractArray,VL<:AbstractArray,ADB<:AD_Backend,R<:AbstractRNG,C<:Function} <: Algorithm
+struct PolicyGradientEstimator{P,O,VPL<:AbstractArray,VPR<:AbstractArray,VO<:AbstractArray,VG<:AbstractArray,VC<:AbstractArray,VL<:AbstractArray,ADB<:AD_Backend,R<:AbstractRNG,C<:Function} <: AriannaAlgorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     optimisers::O               # List of optimisers (one for each move)
     learn_ids::Vector{Int}      # List of learnable moves

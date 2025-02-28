@@ -26,7 +26,7 @@ include("simulation.jl")
 export Simulation, build_schedule, run!
 
 include("algorithms.jl")
-export Algorithm, StoreCallbacks, StoreTrajectories, StoreLastFrames, StoreBackups, PrintTimeSteps
+export AriannaAlgorithm, StoreCallbacks, StoreTrajectories, StoreLastFrames, StoreBackups, PrintTimeSteps
 export TXT, DAT
 
 include("metropolis.jl")
