@@ -35,7 +35,7 @@ Helper function to raise errors for unimplemented required methods.
 raise_error(s) = error("No $s is defined")
 
 """
-    sample_action!(action::Action, policy::Policy, parameters, system, rng)
+    sample_action!(action::Action, policy::Policy, parameters, system::AriannaSystem, rng)
 
 Sample a new action from the policy.
 
@@ -46,10 +46,10 @@ Sample a new action from the policy.
 - `system`: System the action will be applied to
 - `rng`: Random number generator
 """
-sample_action!(action::Action, policy::Policy, parameters, system, rng) = raise_error("sample_action!")
+sample_action!(action::Action, policy::Policy, parameters, system::AriannaSystem, rng) = raise_error("sample_action!")
 
 """
-    log_proposal_density(action, policy, parameters, system)
+    log_proposal_density(action, policy, parameters, system::AriannaSystem)
 
 Calculate the log probability density of proposing the given action.
 
@@ -59,10 +59,10 @@ Calculate the log probability density of proposing the given action.
 - `parameters`: Parameters of the policy
 - `system`: System the action is applied to
 """
-log_proposal_density(action, policy, parameters, system) = raise_error("log_proposal_density")
+log_proposal_density(action, policy, parameters, system::AriannaSystem) = raise_error("log_proposal_density")
 
 """
-    perform_action!(system, action::Action)
+    perform_action!(system::AriannaSystem, action::Action)
 
 Apply the action to modify the system state.
 
@@ -73,7 +73,7 @@ Apply the action to modify the system state.
 # Returns
 A tuple of (x₁, x₂) containing the old and new states
 """
-perform_action!(system, action::Action) = raise_error("perform_action!")
+perform_action!(system::AriannaSystem, action::Action) = raise_error("perform_action!")
 
 """
     unnormalised_log_target_density(x, system)
@@ -84,9 +84,9 @@ Calculate the unnormalized log probability density of a system state.
 - `x`: System state
 - `system`: System object
 """
-unnormalised_log_target_density(x, system) = raise_error("unnormalised_log_target_density")
+unnormalised_log_target_density(x, system::AriannaSystem) = raise_error("unnormalised_log_target_density")
 """
-    delta_log_target_density(x₁, x₂, system)
+    delta_log_target_density(x₁, x₂, system::AriannaSystem)
 
 Calculate the change in log target density between two states.
 
@@ -95,9 +95,9 @@ Calculate the change in log target density between two states.
 - `x₂`: Final state
 - `system`: System object
 """
-delta_log_target_density(x₁, x₂, system) = unnormalised_log_target_density(x₂, system) - unnormalised_log_target_density(x₁, system)
+delta_log_target_density(x₁, x₂, system::AriannaSystem) = unnormalised_log_target_density(x₂, system) - unnormalised_log_target_density(x₁, system)
 """
-    invert_action!(action::Action, system)
+    invert_action!(action::Action, system::AriannaSystem)
 
 Invert/reverse an action.
 
@@ -105,7 +105,7 @@ Invert/reverse an action.
 - `action`: Action to invert
 - `system`: System the action was applied to
 """
-invert_action!(action::Action, system) = raise_error("invert_action!")
+invert_action!(action::Action, system::AriannaSystem) = raise_error("invert_action!")
 
 """
     perform_action_cached!(system, action::Action)
@@ -116,7 +116,7 @@ Optimized version of perform_action! that can reuse cached values.
 - `system`: System to modify
 - `action`: Action to perform
 """
-perform_action_cached!(system, action::Action) = perform_action!(system, action)
+perform_action_cached!(system::AriannaSystem, action::Action) = perform_action!(system, action)
 
 """
     Move{A<:Action,P<:Policy,V<:AbstractArray,T<:AbstractFloat}
@@ -162,7 +162,7 @@ function Move(action, policy, parameters, weight)
 end
 
 """
-    mc_step!(system, action::Action, policy::Policy, parameters::AbstractArray{T}, rng) where {T<:AbstractFloat}
+    mc_step!(system::AriannaSystem, action::Action, policy::Policy, parameters::AbstractArray{T}, rng) where {T<:AbstractFloat}
 
 Perform a single Monte Carlo step.
 
@@ -173,7 +173,7 @@ Perform a single Monte Carlo step.
 - `parameters`: Parameters of the policy
 - `rng`: Random number generator
 """
-function mc_step!(system, action::Action, policy::Policy, parameters::AbstractArray{T}, rng) where {T<:AbstractFloat}
+function mc_step!(system::AriannaSystem, action::Action, policy::Policy, parameters::AbstractArray{T}, rng) where {T<:AbstractFloat}
     sample_action!(action, policy, parameters, system, rng)
     logq_forward = log_proposal_density(action, policy, parameters, system)
     x₁, x₂ = perform_action!(system, action)
@@ -190,7 +190,7 @@ function mc_step!(system, action::Action, policy::Policy, parameters::AbstractAr
 end
 
 """
-    mc_sweep!(system, pool, rng; mc_steps=1)
+    mc_sweep!(system::AriannaSystem, pool, rng; mc_steps=1)
 
 Perform a Monte Carlo sweep over a pool of moves.
 
@@ -200,7 +200,7 @@ Perform a Monte Carlo sweep over a pool of moves.
 - `rng`: Random number generator
 - `mc_steps`: Number of Monte Carlo steps per sweep
 """
-function mc_sweep!(system, pool, rng; mc_steps=1)
+function mc_sweep!(system::AriannaSystem, pool, rng; mc_steps=1)
     weights = [move.weight for move in pool]
     for _ in 1:mc_steps
         id = rand(rng, Categorical(weights))
@@ -244,7 +244,7 @@ struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
         seed::Int=1,
         R::DataType=Xoshiro,
         parallel::Bool=false
-    ) where {S,P}
+    ) where {S<:AriannaSystem,P}
         # Safety checks
         @assert length(chains) == length(pools)
         @assert all(k -> all(move -> move.parameters == getindex.(pools, k)[1].parameters, getindex.(pools, k)), eachindex(pools[1]))

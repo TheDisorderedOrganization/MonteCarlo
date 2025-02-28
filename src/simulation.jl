@@ -4,7 +4,7 @@
 A structure representing a Monte Carlo simulation.
 
 # Fields
-- `chains::Vector{S}`: Vector of independent systems.
+- `chains::Vector{S}`: Vector of independent Arianna systems.
 - `algorithms::A`: List of algorithms.
 - `steps::Int`: Number of MC sweeps.
 - `t::Int`: Current time step.
@@ -27,7 +27,7 @@ mutable struct Simulation{S,A,VS}
     Create a new `Simulation` instance.
 
     # Arguments
-    - `chains::Vector{S}`: Vector of independent systems.
+    - `chains::Vector{S}`: Vector of independent Arianna systems.
     - `algorithms::A`: List of algorithms.
     - `schedulers::VS`: List of schedulers (one for each algorithm).
     - `steps::Int`: Number of MC sweeps.
@@ -41,7 +41,7 @@ mutable struct Simulation{S,A,VS}
         steps::Int;
         path::String="data",
         verbose::Bool=false
-    ) where {S,A,VS}
+    ) where {S<:AriannaSystem,A,VS}
         @assert length(schedulers) == length(algorithms)
         @assert all(scheduler -> all(x -> 0 ≤ x ≤ steps, scheduler), schedulers)
         @assert all(scheduler -> issorted(scheduler), schedulers)
@@ -59,7 +59,7 @@ end
 Create a new `Simulation` instance from a list of algorithm constructors.
 
 # Arguments
-- `chains`: Vector of independent systems.
+- `chains`: Vector of independent Arianna systems.
 - `algorithm_list`: List of algorithm constructors.
 - `steps`: Number of MC sweeps.
 - `path="data"`: Simulation path.
@@ -116,7 +116,7 @@ function build_schedule(steps::Int, burn::Int, block::Vector{Int})
     return filter(x -> x ≤ steps, unique(vcat(blocks..., [steps])))
 end
 
-function write_system(io, system)
+function write_system(io, system::AriannaSystem)
     println(io, "\t" * "$(typeof(system))")
     return nothing
 end

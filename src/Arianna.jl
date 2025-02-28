@@ -14,6 +14,14 @@ using Transducers
 using Dates
 using Printf
 
+"""
+    abstract type AriannaSystem
+
+Abstract type representing a system that can be simulated using methods defined in the `Arianna` module.
+"""
+abstract type AriannaSystem end
+export AriannaSystem
+
 include("simulation.jl")
 export Simulation, build_schedule, run!
 

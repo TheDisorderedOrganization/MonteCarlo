@@ -5,7 +5,7 @@ using Enzyme
 
 struct Enzyme_Backend <: Arianna.PolicyGuided.AD_Backend end
 
-function Arianna.PolicyGuided.withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system, ::Enzyme_Backend;
+function Arianna.PolicyGuided.withgrad_log_proposal_density!(∇logq::T, action::Action, policy::Policy, parameters::T, system::Arianna.AriannaSystem, ::Enzyme_Backend;
     shadow=deepcopy(system)) where {T<:AbstractArray}
     _, logq = Enzyme.autodiff(
         Enzyme.ReverseWithPrimal,
