@@ -30,6 +30,5 @@ makedocs(
 
 # Deploying to GitHub Pages
 deploydocs(
-    repo = "github.com/TheDisorderedOrganization/Arianna.git",
-    devbranch = "main"
+    repo = "github.com/TheDisorderedOrganization/Arianna.git"
 )

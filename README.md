@@ -5,6 +5,9 @@
 <p align="center"><i>A system-agnostic approach to Monte Carlo simulations</i></p>
 
 <p align="center">
+  <a href="https://TheDisorderedOrganization.github.io/Arianna">
+    <img src="https://img.shields.io/badge/docs-online-blue.svg" alt="Docs">
+  </a>
   <a href="https://github.com/TheDisorderedOrganization/MCMC/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-GPL%203.0-red.svg" alt="License">
   </a>
