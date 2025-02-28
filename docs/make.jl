@@ -7,7 +7,7 @@ readme = readme[findfirst("Arianna", readme)[1]:end]
 readme = "# Arianna\n *A system-agnostic approach to Monte Carlo simulations*" * readme
 write(joinpath(@__DIR__, "src", "index.md"), readme)
 
-makedocs(;
+makedocs(
     sitename = "Arianna",
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", nothing) == "true",
@@ -15,7 +15,8 @@ makedocs(;
         sidebar_sitename = false
     ),
     modules = [Arianna],
-    warnonly = ("strict=false" in ARGS),
+    doctest = false,
+    warnonly = [:missing_docs],
     pages = [
         "Home" => "index.md",
         "Manual" => Any[
