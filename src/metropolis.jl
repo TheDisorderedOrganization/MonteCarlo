@@ -212,7 +212,7 @@ function mc_sweep!(system::AriannaSystem, pool, rng; mc_steps=1)
 end
 
 """
-    Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
+    Metropolis{P,R<:AbstractRNG,C<:Function} <: AriannaAlgorithm
 
 A struct representing a Metropolis Monte Carlo algorithm.
 
@@ -229,7 +229,7 @@ A struct representing a Metropolis Monte Carlo algorithm.
 - `R`: Type of the random number generator
 - `C`: Type of the transducer
 """
-struct Metropolis{P,R<:AbstractRNG,C<:Function} <: Algorithm
+struct Metropolis{P,R<:AbstractRNG,C<:Function} <: AriannaAlgorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     sweepstep::Int              # Number of mc steps per mc sweep
     seed::Int                   # Random number seed
@@ -363,7 +363,7 @@ function write_algorithm(io, algorithm::Metropolis, scheduler)
 end
 
 """
-    StoreParameters{V<:AbstractArray} <: Algorithm
+    StoreParameters{V<:AbstractArray} <: AriannaAlgorithm
 
 A struct representing a parameter store.
 
@@ -377,7 +377,7 @@ A struct representing a parameter store.
 # Type Parameters
 - `V`: Type of the parameter array
 """
-struct StoreParameters{V<:AbstractArray} <: Algorithm
+struct StoreParameters{V<:AbstractArray} <: AriannaAlgorithm
     paths::Vector{String}
     files::Vector{IOStream}
     parameters_list::V

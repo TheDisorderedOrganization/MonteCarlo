@@ -1,43 +1,43 @@
 """
-    abstract type Algorithm
+    abstract type AriannaAlgorithm
 
 Abstract type for Simulation algorithms.
 """
-abstract type Algorithm end
+abstract type AriannaAlgorithm end
 
 """
-    initialise(::Algorithm, ::Simulation)
+    initialise(::AriannaAlgorithm, ::Simulation)
 
 Initialise the algorithm for the given simulation.
 """
-initialise(::Algorithm, ::Simulation) = nothing
+initialise(::AriannaAlgorithm, ::Simulation) = nothing
 
 """
-    make_step!(::Simulation, ::Algorithm)
+    make_step!(::Simulation, ::AriannaAlgorithm)
 
 Perform a single step of the algorithm in the simulation.
 """
-make_step!(::Simulation, ::Algorithm) = nothing
+make_step!(::Simulation, ::AriannaAlgorithm) = nothing
 
 """
-    finalise(::Algorithm, ::Simulation)
+    finalise(::AriannaAlgorithm, ::Simulation)
 
 Finalise the algorithm for the given simulation.
 """
-finalise(::Algorithm, ::Simulation) = nothing
+finalise(::AriannaAlgorithm, ::Simulation) = nothing
 
 """
-    write_algorithm(io, algorithm::Algorithm, scheduler)
+    write_algorithm(io, algorithm::AriannaAlgorithm, scheduler)
 
 Write a summary of the algorithm on the given IO stream.
 """
-function write_algorithm(io, algorithm::Algorithm, scheduler)
+function write_algorithm(io, algorithm::AriannaAlgorithm, scheduler)
     println(io, "\t" * replace(string(typeof(algorithm)), r"\{.*" => ""))
     println(io, "\t\tCalls: $(length(filter(x -> 0 < x ≤ scheduler[end], scheduler)))")
 end
 
 """
-    StoreCallbacks{V} <: Algorithm
+    StoreCallbacks{V} <: AriannaAlgorithm
 
 Algorithm to store callback values during simulation.
 
@@ -59,7 +59,7 @@ Create a new StoreCallbacks instance.
 - `store_first=true`: Store values at initialization
 - `store_last=false`: Store values at finalization
 """
-struct StoreCallbacks{V} <: Algorithm
+struct StoreCallbacks{V} <: AriannaAlgorithm
     callbacks::V
     paths::Vector{String}
     files::Vector{IOStream}
@@ -140,7 +140,7 @@ struct DAT <: Format
 end
 
 """
-    StoreTrajectories{F<:Format} <: Algorithm
+    StoreTrajectories{F<:Format} <: AriannaAlgorithm
 
 Algorithm to store system trajectories during simulation.
 
@@ -151,7 +151,7 @@ Algorithm to store system trajectories during simulation.
 - `store_first::Bool`: Whether to store trajectories at initialization
 - `store_last::Bool`: Whether to store trajectories at finalization
 """
-struct StoreTrajectories{F<:Format} <: Algorithm
+struct StoreTrajectories{F<:Format} <: AriannaAlgorithm
     paths::Vector{String}
     files::Vector{IOStream}
     fmt::F
@@ -210,7 +210,7 @@ function finalise(algorithm::StoreTrajectories, simulation::Simulation)
 end
 
 """
-    StoreLastFrames <: Algorithm
+    StoreLastFrames <: AriannaAlgorithm
 
 Algorithm to store the final state of each system at the end of simulation.
 
@@ -218,7 +218,7 @@ Algorithm to store the final state of each system at the end of simulation.
 - `paths::Vector{String}`: Paths to output files
 - `fmt::Format`: Format type for output files
 """
-struct StoreLastFrames <: Algorithm
+struct StoreLastFrames <: AriannaAlgorithm
     paths::Vector{String}
     fmt::Format
     function StoreLastFrames(chains, path, fmt)
@@ -251,7 +251,7 @@ function finalise(algorithm::StoreLastFrames, simulation::Simulation)
 end
 
 """
-    StoreBackups <: Algorithm
+    StoreBackups <: AriannaAlgorithm
 
 Algorithm to create backup files of system states during simulation.
 
@@ -261,7 +261,7 @@ Algorithm to create backup files of system states during simulation.
 - `store_first::Bool`: Whether to store backups at initialization
 - `store_last::Bool`: Whether to store backups at finalization
 """
-struct StoreBackups <: Algorithm
+struct StoreBackups <: AriannaAlgorithm
     dirs::Vector{String}
     fmt::Format
     store_first::Bool
@@ -303,11 +303,11 @@ function finalise(algorithm::StoreBackups, simulation::Simulation)
 end
 
 """
-    PrintTimeSteps <: Algorithm
+    PrintTimeSteps <: AriannaAlgorithm
 
 Algorithm to display a progress bar and current timestep during simulation.
 """
-struct PrintTimeSteps <: Algorithm end
+struct PrintTimeSteps <: AriannaAlgorithm end
 
 function PrintTimeSteps(chains; extras...)
     return PrintTimeSteps()

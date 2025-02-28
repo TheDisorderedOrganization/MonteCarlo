@@ -1,5 +1,5 @@
 """
-    PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorithm
+    PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: AriannaAlgorithm
 
 Algorithm for updating policy parameters in Monte Carlo simulations.
 
@@ -11,7 +11,7 @@ Algorithm for updating policy parameters in Monte Carlo simulations.
 - `gradients_data::VG`: Gradient information (one for each move)
 """
 
-struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: Algorithm
+struct PolicyGradientUpdate{P,O,VPR<:AbstractArray,VG<:AbstractArray} <: AriannaAlgorithm
     pools::Vector{P}            # Vector of independent pools (one for each system)
     optimisers::O               # List of optimisers (one for each move)
     learn_ids::Vector{Int}      # List of learnable moves
