@@ -13,7 +13,7 @@ Manifest.toml
 *.DS_Store
 *.gz
 *.cov
-
+id_*
 build/
 log_output/
 log_error/

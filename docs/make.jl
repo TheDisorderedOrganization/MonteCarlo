@@ -8,25 +8,26 @@ readme = "# Arianna\n *A system-agnostic approach to Monte Carlo simulations*" *
 write(joinpath(@__DIR__, "src", "index.md"), readme)
 
 makedocs(sitename="Arianna",
-    format=Documenter.HTML(
-        prettyurls=(get(ENV, "CI", nothing) == "true"),
-        size_threshold_ignore=["api.md"],
-        sidebar_sitename=false,
-    ),
-    #modules=[Arianna],
-pages = [
-    "Home" => "index.md",
-    "Manual" => Any[
-        "man/montecarlo.md",
-        "man/system.md",
-        "man/policyguided.md"
-    ],
-    "Related packages" => "related.md",
-    "API" => "api.md",
-],
+        format = Documenter.HTML(
+                        prettyurls=(get(ENV, "CI", nothing) == "true"),
+                        size_threshold_ignore=["api.md"],
+                        sidebar_sitename=false,
+                ),
+        modules = [Arianna],
+        pages = [
+                "Home" => "index.md",
+                "Manual" => Any[
+                                "man/montecarlo.md",
+                                "man/system.md",
+                                "man/policyguided.md"
+                ],
+                "Related packages" => "related.md",
+                "API" => "api.md",
+                 ],
 )
 
-# deploydocs(
-#     repo="https://github.com/TheDisorderedOrganization/Arianna",
-#     push_preview=true,
-# )
+# Deploying to GitHub Pages
+deploydocs(
+    repo = "github.com/TheDisorderedOrganization/Arianna.git",
+    devbranch = "main"
+)
