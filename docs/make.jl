@@ -7,24 +7,25 @@ readme = readme[findfirst("Arianna", readme)[1]:end]
 readme = "# Arianna\n *A system-agnostic approach to Monte Carlo simulations*" * readme
 write(joinpath(@__DIR__, "src", "index.md"), readme)
 
-makedocs(sitename="Arianna",
-        format = Documenter.HTML(
-                        prettyurls=(get(ENV, "CI", nothing) == "true"),
-                        size_threshold_ignore=["api.md"],
-                        sidebar_sitename=false,
-                ),
-        modules = [Arianna],
-        strict = false,
-        pages = [
-                "Home" => "index.md",
-                "Manual" => Any[
-                                "man/montecarlo.md",
-                                "man/system.md",
-                                "man/policyguided.md"
-                ],
-                "Related packages" => "related.md",
-                "API" => "api.md",
-                 ],
+makedocs(;
+    sitename = "Arianna",
+    format = Documenter.HTML(;
+        prettyurls = get(ENV, "CI", nothing) == "true",
+        size_threshold_ignore = ["api.md"],
+        sidebar_sitename = false
+    ),
+    modules = [Arianna],
+    warnonly = ("strict=false" in ARGS),
+    pages = [
+        "Home" => "index.md",
+        "Manual" => Any[
+            "man/montecarlo.md",
+            "man/system.md",
+            "man/policyguided.md"
+        ],
+        "Related packages" => "related.md",
+        "API" => "api.md",
+    ]
 )
 
 # Deploying to GitHub Pages
